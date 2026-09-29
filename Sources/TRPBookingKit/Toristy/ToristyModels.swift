@@ -691,8 +691,9 @@ public enum ToristyPaymentStatus: Sendable, Hashable {
     case timedOut
     case other(String)
 
+    /// Reads Toristy's status text regardless of case and of spaces, underscores or hyphens between its words.
     public init(_ raw: String) {
-        switch raw.lowercased().replacingOccurrences(of: " ", with: "") {
+        switch raw.lowercased().filter({ !" _-".contains($0) }) {
         case "confirmed": self = .confirmed
         case "reserved": self = .reserved
         case "cancelled", "canceled": self = .cancelled
