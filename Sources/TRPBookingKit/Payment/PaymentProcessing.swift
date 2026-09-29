@@ -20,7 +20,12 @@ public struct PaymentRequest: Sendable, Hashable {
 
     /// The amount in the currency's minor unit, as Stripe expects it.
     public var minorUnitAmount: Int {
-        let digits = PaymentRequest.zeroDecimalCurrencies.contains(currency) ? 0 : 2
+        PaymentRequest.minorUnits(of: amount, currency: currency)
+    }
+
+    /// `amount` in the currency's minor unit, rounded half up.
+    public static func minorUnits(of amount: Decimal, currency: String) -> Int {
+        let digits = zeroDecimalCurrencies.contains(currency.uppercased()) ? 0 : 2
         var scaled = amount * pow(10, digits)
         var rounded = Decimal()
         NSDecimalRound(&rounded, &scaled, 0, .plain)
