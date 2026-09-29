@@ -1,0 +1,83 @@
+<!doctype html>
+<!--
+  Reference page for Viator's VIATOR_FORM payment step, served from the origin sent as `hostingUrl`
+  (ViatorCredentials.paymentPageURL). ViatorPaymentWebSession loads it and then calls
+  window.trpViatorPayment.start({sessionToken, language}); the page answers through
+  window.webkit.messageHandlers.viatorPayment (iOS) or window.AndroidViator (Android).
+  A rejected card stays on the page so the customer can retry; `error` is posted only when the form cannot start.
+
+  TO VERIFY against Viator's partner technical guide before going live:
+  - the global and constructor payment.js exposes (written here as `Payment`) and its options;
+  - the submit call (written here as `submitForm`) and the callback names onSubmitSuccess / onSubmitError;
+  - the device fingerprint step, if the library does not run it on its own;
+  - the exact CSP hosts Viator's iframe and fingerprint scripts need.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' https://checkout-assets.payments.tamg.cloud; frame-src https://*.payments.tamg.cloud; connect-src https://*.payments.tamg.cloud; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:">
+  <title>Payment</title>
+  <script src="https://checkout-assets.payments.tamg.cloud/stable/v2/payment.js"></script>
+  <style>
+    body { margin: 0; padding: 16px; font: 16px -apple-system, system-ui, sans-serif; background: #fff; color: #111; }
+    #pay { width: 100%; margin-top: 16px; padding: 14px; font-size: 17px; border: 0; border-radius: 10px; background: #0a66ff; color: #fff; }
+    #pay:disabled { opacity: .5; }
+    #error { color: #c00; min-height: 1.2em; margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <div id="card-form"></div>
+  <button id="pay" disabled>Pay</button>
+  <div id="error" role="alert"></div>
+  <script>
+    (function () {
+      function post(message) {
+        if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.viatorPayment) {
+          window.webkit.messageHandlers.viatorPayment.postMessage(message);
+        } else if (window.AndroidViator) {
+          if (message.event === 'success') window.AndroidViator.onPaymentSuccess(message.paymentToken);
+          else if (message.event === 'error') window.AndroidViator.onPaymentError(message.message || '');
+          else if (message.event === 'cancel') window.AndroidViator.onPaymentCancel();
+        }
+      }
+
+      var payButton = document.getElementById('pay');
+      var errorLabel = document.getElementById('error');
+      var payment = null;
+
+      window.trpViatorPayment = {
+        start: function (options) {
+          try {
+            payment = new Payment({
+              sessionToken: options.sessionToken,
+              language: options.language,
+              container: '#card-form',
+              onSubmitSuccess: function (result) {
+                post({ event: 'success', paymentToken: result && result.paymentToken ? result.paymentToken : result });
+              },
+              onSubmitError: function (error) {
+                payButton.disabled = false;
+                errorLabel.textContent = (error && error.message) || 'The payment could not be completed.';
+              }
+            });
+            payButton.disabled = false;
+            post({ event: 'ready' });
+          } catch (error) {
+            post({ event: 'error', message: String(error) });
+          }
+        },
+        cancel: function () { post({ event: 'cancel' }); }
+      };
+
+      payButton.addEventListener('click', function () {
+        if (!payment) return;
+        payButton.disabled = true;
+        errorLabel.textContent = '';
+        payment.submitForm();
+      });
+    })();
+  </script>
+</body>
+</html>
