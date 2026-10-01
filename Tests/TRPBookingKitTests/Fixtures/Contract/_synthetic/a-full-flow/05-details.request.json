@@ -41,6 +41,10 @@
       "t3.age": 9,
       "t3.guardian": "Ada Lovelace"
     },
+    "expectedAmount": {
+      "amount": "185.00",
+      "currency": "EUR"
+    },
     "lang": "en"
   }
 }

@@ -70,8 +70,8 @@ extension BookingContract {
         }
     }
 
-    /// `POST /checkouts/{id}/steps/{stepId}`; `expectedAmount` is the amount on screen, needed on the submit
-    /// that leads to payment.
+    /// `POST /checkouts/{id}/steps/{stepId}`; `expectedAmount` is the checkout's current amount, sent on every
+    /// submit while it is known and checked only on the submit that moves the checkout to `awaiting_payment`.
     public struct SubmitStepRequest: Codable, Hashable, Sendable {
         public let answers: Answers
         public let expectedAmount: Money?

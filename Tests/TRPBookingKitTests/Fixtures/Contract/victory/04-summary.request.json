@@ -11,6 +11,10 @@
   },
   "body": {
     "answers": {},
+    "expectedAmount": {
+      "amount": "212.40",
+      "currency": "USD"
+    },
     "lang": "en"
   }
 }

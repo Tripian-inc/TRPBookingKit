@@ -20,6 +20,10 @@
       "t3.fullName": "Deniz Demir",
       "t3.birthDate": "2017-05-09"
     },
+    "expectedAmount": {
+      "amount": "62.50",
+      "currency": "EUR"
+    },
     "lang": "en"
   }
 }

@@ -19,6 +19,10 @@
         "text": "Cruise terminal, gate A"
       }
     },
+    "expectedAmount": {
+      "amount": "145.00",
+      "currency": "EUR"
+    },
     "lang": "en"
   }
 }
