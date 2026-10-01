@@ -1,0 +1,51 @@
+{
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 200,
+    "success": true,
+    "message": null,
+    "UUID": "c73b7d9b-a717-4ff3-8651-764260876e04",
+    "data": {
+      "id": "chk_01SYNC0001",
+      "status": "awaiting_payment",
+      "provider": "synthetic",
+      "product": {
+        "id": "SYN-C-HOSTED-FORM-DECLINED",
+        "optionId": null,
+        "title": "Synthetic museum entry",
+        "imageUrl": null
+      },
+      "amount": {
+        "amount": "60.00",
+        "currency": "EUR"
+      },
+      "holdExpiresAt": "2026-10-02T11:45:00Z",
+      "priceValidUntil": "2026-10-02T11:45:00Z",
+      "currentStep": null,
+      "nextAction": {
+        "id": "act_SYNC01",
+        "type": "provider_hosted_form",
+        "params": {
+          "paymentSessionToken": "syn_pst_c1"
+        },
+        "expiresAt": "2026-10-02T11:45:00Z"
+      },
+      "allowedActions": [
+        "cancel"
+      ],
+      "booking": {
+        "uuid": "6e8a0c2e-4f1b-4d3a-8b5c-9d1e3f5a7b9c",
+        "status": "on_hold"
+      },
+      "result": null,
+      "fallback": {
+        "webUrl": "https://book.tripian.com/c/chk_01SYNC0001",
+        "text": "Continue your booking on the web."
+      }
+    }
+  }
+}

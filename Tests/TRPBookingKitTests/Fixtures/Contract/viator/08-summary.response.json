@@ -1,0 +1,51 @@
+{
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 200,
+    "success": true,
+    "message": null,
+    "UUID": "f5b4a3c2-0d1e-4f2a-9b43-6d7e8f9a0b14",
+    "data": {
+      "id": "chk_01J9ZQ4M8K",
+      "status": "awaiting_payment",
+      "provider": "viator",
+      "product": {
+        "id": "5010BCN_SAGRADA",
+        "optionId": "TG1",
+        "title": "Sagrada Família guided tour",
+        "imageUrl": "https://cdn.tripian.com/p/5010BCN_SAGRADA.jpg"
+      },
+      "amount": {
+        "amount": "145.00",
+        "currency": "EUR"
+      },
+      "holdExpiresAt": "2026-10-02T14:20:00Z",
+      "priceValidUntil": "2026-10-02T14:20:00Z",
+      "currentStep": null,
+      "nextAction": {
+        "id": "act_01J9ZR2B",
+        "type": "provider_hosted_form",
+        "params": {
+          "paymentSessionToken": "vps_7Hq2LmN9xR4tB8wK"
+        },
+        "expiresAt": "2026-10-02T14:20:00Z"
+      },
+      "allowedActions": [
+        "cancel"
+      ],
+      "booking": {
+        "uuid": "3f6c1a9e-8d2b-4b7a-a1c4-5e9f0d2b7c11",
+        "status": "on_hold"
+      },
+      "result": null,
+      "fallback": {
+        "webUrl": "https://book.tripian.com/c/chk_01J9ZQ4M8K",
+        "text": "Continue your booking on the web."
+      }
+    }
+  }
+}

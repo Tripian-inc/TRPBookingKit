@@ -1,0 +1,91 @@
+{
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 200,
+    "success": true,
+    "message": null,
+    "UUID": "96153180-9c87-472d-8633-6cb0aff556c1",
+    "data": {
+      "id": "chk_01SYND0001",
+      "status": "collecting_details",
+      "provider": "synthetic",
+      "product": {
+        "id": "SYN-D-DROPIN-PENDING",
+        "optionId": null,
+        "title": "Synthetic concert",
+        "imageUrl": null
+      },
+      "amount": null,
+      "holdExpiresAt": null,
+      "priceValidUntil": null,
+      "currentStep": {
+        "id": "seats",
+        "title": "Choose seats",
+        "subtitle": null,
+        "progress": {
+          "index": 1,
+          "count": 2
+        },
+        "blocks": [
+          {
+            "type": "choice",
+            "id": "zone",
+            "multiple": false,
+            "options": [
+              {
+                "value": "ZONE_A",
+                "title": "Zone A",
+                "price": {
+                  "amount": "75.00",
+                  "currency": "USD"
+                }
+              }
+            ]
+          },
+          {
+            "type": "quantity",
+            "id": "units",
+            "items": [
+              {
+                "unitId": "SEAT",
+                "title": "Seats",
+                "price": {
+                  "amount": "75.00",
+                  "currency": "USD"
+                },
+                "min": 2,
+                "max": 4,
+                "allowed": [
+                  2,
+                  4
+                ]
+              }
+            ],
+            "total": {
+              "min": 2,
+              "max": 4
+            }
+          }
+        ],
+        "primaryAction": {
+          "title": "Continue"
+        }
+      },
+      "nextAction": null,
+      "allowedActions": [
+        "submit",
+        "cancel"
+      ],
+      "booking": null,
+      "result": null,
+      "fallback": {
+        "webUrl": "https://book.tripian.com/c/chk_01SYND0001",
+        "text": "Continue your booking on the web."
+      }
+    }
+  }
+}

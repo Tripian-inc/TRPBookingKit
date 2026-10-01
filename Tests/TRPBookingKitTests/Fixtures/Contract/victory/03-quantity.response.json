@@ -1,0 +1,96 @@
+{
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 200,
+    "success": true,
+    "message": null,
+    "UUID": "420d13a8-6487-4b10-a3b7-1fc1cc788161",
+    "data": {
+      "id": "chk_01J9ZV3R6Q",
+      "status": "collecting_details",
+      "provider": "victory",
+      "product": {
+        "id": "TEVO-2817364",
+        "optionId": "TG_88122",
+        "title": "Hamilton on Broadway",
+        "imageUrl": "https://cdn.tripian.com/p/TEVO-2817364.jpg"
+      },
+      "amount": {
+        "amount": "212.40",
+        "currency": "USD"
+      },
+      "holdExpiresAt": null,
+      "priceValidUntil": "2026-10-02T16:18:00Z",
+      "currentStep": {
+        "id": "summary",
+        "title": "Summary",
+        "subtitle": null,
+        "progress": {
+          "index": 3,
+          "count": 4
+        },
+        "blocks": [
+          {
+            "type": "summary",
+            "id": "summary",
+            "lines": [
+              {
+                "title": "2 × Mezzanine, Row C",
+                "amount": {
+                  "amount": "178.00",
+                  "currency": "USD"
+                }
+              },
+              {
+                "title": "Service fees",
+                "amount": {
+                  "amount": "26.70",
+                  "currency": "USD"
+                }
+              },
+              {
+                "title": "Taxes",
+                "detail": "New York sales tax",
+                "amount": {
+                  "amount": "7.70",
+                  "currency": "USD"
+                }
+              }
+            ],
+            "total": {
+              "amount": "212.40",
+              "currency": "USD"
+            },
+            "note": "15 October 2026, 19:00 · Richard Rodgers Theatre"
+          },
+          {
+            "type": "notice",
+            "id": "final-sale",
+            "tone": "warning",
+            "text": "All sales are final. Tickets cannot be cancelled in the app.",
+            "onUnsupported": "skip"
+          }
+        ],
+        "primaryAction": {
+          "title": "Continue"
+        }
+      },
+      "nextAction": null,
+      "allowedActions": [
+        "submit",
+        "back",
+        "cancel"
+      ],
+      "booking": null,
+      "result": null,
+      "fallback": {
+        "webUrl": "https://book.tripian.com/c/chk_01J9ZV3R6Q",
+        "text": "Continue your booking on the web."
+      }
+    }
+  }
+}

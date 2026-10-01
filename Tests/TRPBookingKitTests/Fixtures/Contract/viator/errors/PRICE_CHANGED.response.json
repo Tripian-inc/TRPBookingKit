@@ -1,0 +1,108 @@
+{
+  "status": 409,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 409,
+    "success": false,
+    "message": "The price has changed: new total 152.00 EUR.",
+    "UUID": "a2c1b0d9-7e8f-4a9b-8cba-3e4f5a6b7c81",
+    "data": {
+      "code": "PRICE_CHANGED",
+      "errors": [],
+      "retryable": false,
+      "checkout": {
+        "id": "chk_01J9ZQ4M8K",
+        "status": "collecting_details",
+        "provider": "viator",
+        "product": {
+          "id": "5010BCN_SAGRADA",
+          "optionId": "TG1",
+          "title": "Sagrada Família guided tour",
+          "imageUrl": "https://cdn.tripian.com/p/5010BCN_SAGRADA.jpg"
+        },
+        "amount": {
+          "amount": "152.00",
+          "currency": "EUR"
+        },
+        "holdExpiresAt": "2026-10-02T14:20:00Z",
+        "priceValidUntil": "2026-10-02T14:20:00Z",
+        "currentStep": {
+          "id": "summary",
+          "title": "Summary",
+          "subtitle": null,
+          "progress": {
+            "index": 5,
+            "count": 5
+          },
+          "blocks": [
+            {
+              "type": "summary",
+              "id": "summary",
+              "lines": [
+                {
+                  "title": "2 × Adult",
+                  "amount": {
+                    "amount": "114.00",
+                    "currency": "EUR"
+                  }
+                },
+                {
+                  "title": "1 × Child",
+                  "amount": {
+                    "amount": "38.00",
+                    "currency": "EUR"
+                  }
+                }
+              ],
+              "total": {
+                "amount": "152.00",
+                "currency": "EUR"
+              },
+              "note": "15 October 2026, 10:30"
+            },
+            {
+              "type": "notice",
+              "id": "cancellation",
+              "tone": "info",
+              "text": "Free cancellation until 14 October, 10:30.",
+              "onUnsupported": "skip"
+            },
+            {
+              "type": "consent",
+              "id": "terms",
+              "text": "I accept the terms of sale.",
+              "links": [
+                {
+                  "title": "Terms",
+                  "url": "https://www.tripian.com/terms"
+                }
+              ],
+              "required": true
+            }
+          ],
+          "primaryAction": {
+            "title": "Continue to payment"
+          }
+        },
+        "nextAction": null,
+        "allowedActions": [
+          "submit",
+          "back",
+          "cancel"
+        ],
+        "booking": {
+          "uuid": "3f6c1a9e-8d2b-4b7a-a1c4-5e9f0d2b7c11",
+          "status": "on_hold"
+        },
+        "result": null,
+        "fallback": {
+          "webUrl": "https://book.tripian.com/c/chk_01J9ZQ4M8K",
+          "text": "Continue your booking on the web."
+        }
+      }
+    }
+  }
+}

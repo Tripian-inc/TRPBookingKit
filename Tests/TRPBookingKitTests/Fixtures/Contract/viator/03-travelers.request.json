@@ -1,0 +1,21 @@
+{
+  "method": "POST",
+  "path": "/tour-api/checkouts/chk_01J9ZQ4M8K/steps/travelers",
+  "headers": {
+    "x-api-key": "tripian-test-api-key",
+    "Authorization": "Bearer eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0LXVzZXIifQ.c2lnbmF0dXJl",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "Tripian-Booking-Version": "2026-10-01",
+    "Idempotency-Key": "5101d9e3-7f9b-4305-a524-e32ca697706e"
+  },
+  "body": {
+    "answers": {
+      "units": {
+        "ADULT": 2,
+        "CHILD": 1
+      }
+    },
+    "lang": "en"
+  }
+}

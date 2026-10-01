@@ -1,0 +1,88 @@
+{
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 200,
+    "success": true,
+    "message": null,
+    "UUID": "3d5d5cbf-56d9-496f-970a-a57cf7a0944a",
+    "data": {
+      "id": "chk_01SYNC0001",
+      "status": "collecting_details",
+      "provider": "synthetic",
+      "product": {
+        "id": "SYN-C-HOSTED-FORM-DECLINED",
+        "optionId": null,
+        "title": "Synthetic museum entry",
+        "imageUrl": null
+      },
+      "amount": {
+        "amount": "60.00",
+        "currency": "EUR"
+      },
+      "holdExpiresAt": "2026-10-02T11:45:00Z",
+      "priceValidUntil": "2026-10-02T11:45:00Z",
+      "currentStep": {
+        "id": "review",
+        "title": "Review",
+        "subtitle": null,
+        "progress": {
+          "index": 2,
+          "count": 2
+        },
+        "blocks": [
+          {
+            "type": "summary",
+            "id": "summary",
+            "lines": [
+              {
+                "title": "2 × Adult",
+                "amount": {
+                  "amount": "60.00",
+                  "currency": "EUR"
+                }
+              }
+            ],
+            "total": {
+              "amount": "60.00",
+              "currency": "EUR"
+            }
+          },
+          {
+            "type": "consent",
+            "id": "terms",
+            "text": "I accept the terms of sale.",
+            "links": [
+              {
+                "title": "Terms",
+                "url": "https://www.tripian.com/terms"
+              }
+            ],
+            "required": true
+          }
+        ],
+        "primaryAction": {
+          "title": "Continue to payment"
+        }
+      },
+      "nextAction": null,
+      "allowedActions": [
+        "submit",
+        "back",
+        "cancel"
+      ],
+      "booking": {
+        "uuid": "6e8a0c2e-4f1b-4d3a-8b5c-9d1e3f5a7b9c",
+        "status": "on_hold"
+      },
+      "result": null,
+      "fallback": {
+        "webUrl": "https://book.tripian.com/c/chk_01SYNC0001",
+        "text": "Continue your booking on the web."
+      }
+    }
+  }
+}

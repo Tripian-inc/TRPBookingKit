@@ -1,0 +1,21 @@
+{
+  "method": "POST",
+  "path": "/tour-api/checkouts",
+  "headers": {
+    "x-api-key": "tripian-test-api-key",
+    "Authorization": "Bearer eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0LXVzZXIifQ.c2lnbmF0dXJl",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "Tripian-Booking-Version": "2026-10-01",
+    "Idempotency-Key": "4bc1e2dd-e147-47a4-b7a7-c41865736549",
+    "Tripian-Client-Capabilities": "blocks=date,choice,quantity,field,consent,summary,notice; fields=text,email,phone,date,select,country,boolean,locationOrText; actions=stripe_payment_intent,provider_hosted_form,braintree_dropin"
+  },
+  "body": {
+    "productId": "TEVO-2817364",
+    "optionId": null,
+    "date": "2026-10-15",
+    "currency": "USD",
+    "bookingUuid": "5c7e9a1b-3d4f-4b6a-8c2d-7e9f1a2b3c4d",
+    "lang": "en"
+  }
+}

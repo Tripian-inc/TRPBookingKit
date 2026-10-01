@@ -1,0 +1,90 @@
+{
+  "status": 409,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 409,
+    "success": false,
+    "message": "This screen is out of date. Showing the current step.",
+    "UUID": "a46b9d74-36d4-4b42-82aa-b1d0041bb9cc",
+    "data": {
+      "code": "STEP_MISMATCH",
+      "errors": [],
+      "retryable": false,
+      "checkout": {
+        "id": "chk_01J9ZQ4M8K",
+        "status": "collecting_details",
+        "provider": "viator",
+        "product": {
+          "id": "5010BCN_SAGRADA",
+          "optionId": null,
+          "title": "Sagrada Família guided tour",
+          "imageUrl": "https://cdn.tripian.com/p/5010BCN_SAGRADA.jpg"
+        },
+        "amount": null,
+        "holdExpiresAt": null,
+        "priceValidUntil": null,
+        "currentStep": {
+          "id": "travelers",
+          "title": "Number of travelers",
+          "subtitle": "15 October 2026",
+          "progress": {
+            "index": 2,
+            "count": null
+          },
+          "blocks": [
+            {
+              "type": "quantity",
+              "id": "units",
+              "items": [
+                {
+                  "unitId": "ADULT",
+                  "title": "Adult",
+                  "subtitle": "Age 13+",
+                  "price": {
+                    "amount": "55.00",
+                    "currency": "EUR"
+                  },
+                  "min": 1,
+                  "max": 9
+                },
+                {
+                  "unitId": "CHILD",
+                  "title": "Child",
+                  "subtitle": "Age 4–12",
+                  "price": {
+                    "amount": "35.00",
+                    "currency": "EUR"
+                  },
+                  "min": 0,
+                  "max": 9
+                }
+              ],
+              "total": {
+                "min": 1,
+                "max": 9
+              }
+            }
+          ],
+          "primaryAction": {
+            "title": "Continue"
+          }
+        },
+        "nextAction": null,
+        "allowedActions": [
+          "submit",
+          "back",
+          "cancel"
+        ],
+        "booking": null,
+        "result": null,
+        "fallback": {
+          "webUrl": "https://book.tripian.com/c/chk_01J9ZQ4M8K",
+          "text": "Continue your booking on the web."
+        }
+      }
+    }
+  }
+}

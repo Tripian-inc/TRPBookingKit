@@ -1,0 +1,16 @@
+{
+  "method": "POST",
+  "path": "/tour-api/bookings/5c7e9a1b-3d4f-4b6a-8c2d-7e9f1a2b3c4d/cancel",
+  "headers": {
+    "x-api-key": "tripian-test-api-key",
+    "Authorization": "Bearer eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0LXVzZXIifQ.c2lnbmF0dXJl",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "Tripian-Booking-Version": "2026-10-01",
+    "Idempotency-Key": "e7fc56ff-f2ac-4302-a629-31f46d1e56ae"
+  },
+  "body": {
+    "reason": "customer_request",
+    "lang": "en"
+  }
+}

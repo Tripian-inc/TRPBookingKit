@@ -1,0 +1,19 @@
+{
+  "status": 422,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 422,
+    "success": false,
+    "message": "This request does not match an earlier request with the same key.",
+    "UUID": "256b0582-7f70-41b9-bc0f-7d17bf0d5e2c",
+    "data": {
+      "code": "IDEMPOTENCY_MISMATCH",
+      "errors": [],
+      "retryable": false,
+      "checkout": null
+    }
+  }
+}

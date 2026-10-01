@@ -1,0 +1,52 @@
+{
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 200,
+    "success": true,
+    "message": null,
+    "UUID": "b6dc64a1-87ec-47cd-8507-2ec4dfb834ea",
+    "data": {
+      "id": "chk_01J9ZV3R6Q",
+      "status": "awaiting_payment",
+      "provider": "victory",
+      "product": {
+        "id": "TEVO-2817364",
+        "optionId": "TG_88122",
+        "title": "Hamilton on Broadway",
+        "imageUrl": "https://cdn.tripian.com/p/TEVO-2817364.jpg"
+      },
+      "amount": {
+        "amount": "212.40",
+        "currency": "USD"
+      },
+      "holdExpiresAt": null,
+      "priceValidUntil": "2026-10-02T16:18:00Z",
+      "currentStep": null,
+      "nextAction": {
+        "id": "act_01J9ZV9K",
+        "type": "braintree_dropin",
+        "params": {
+          "clientToken": "bt_ct_sandbox_6xk2p9q4z8m1",
+          "amount": {
+            "amount": "212.40",
+            "currency": "USD"
+          }
+        },
+        "expiresAt": "2026-10-02T16:18:00Z"
+      },
+      "allowedActions": [
+        "cancel"
+      ],
+      "booking": null,
+      "result": null,
+      "fallback": {
+        "webUrl": "https://book.tripian.com/c/chk_01J9ZV3R6Q",
+        "text": "Continue your booking on the web."
+      }
+    }
+  }
+}

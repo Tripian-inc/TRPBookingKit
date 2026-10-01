@@ -1,0 +1,21 @@
+{
+  "method": "POST",
+  "path": "/tour-api/checkouts",
+  "headers": {
+    "x-api-key": "tripian-test-api-key",
+    "Authorization": "Bearer eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0LXVzZXIifQ.c2lnbmF0dXJl",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "Tripian-Booking-Version": "2026-10-01",
+    "Idempotency-Key": "4990ca50-072c-482d-9d46-a16cdd9ebc6c",
+    "Tripian-Client-Capabilities": "blocks=date,choice,quantity,field,consent,summary,notice,image,section; fields=text,multiline,email,phone,number,numberWithUnit,date,time,select,multiSelect,country,boolean,locationOrText; actions=stripe_payment_intent,provider_hosted_form,braintree_dropin,redirect,three_ds"
+  },
+  "body": {
+    "productId": "SYN-F-HOLD-EXPIRED",
+    "optionId": null,
+    "date": "2026-10-15",
+    "currency": "EUR",
+    "bookingUuid": "4f6a8c0e-2b3d-4e5f-a7b9-c1d3e5f7a9b1",
+    "lang": "en"
+  }
+}

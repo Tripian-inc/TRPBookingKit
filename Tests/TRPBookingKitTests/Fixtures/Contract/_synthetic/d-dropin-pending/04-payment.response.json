@@ -1,0 +1,46 @@
+{
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 200,
+    "success": true,
+    "message": null,
+    "UUID": "28a4c613-78e3-4da1-92bd-885d5c4312bb",
+    "data": {
+      "id": "chk_01SYND0001",
+      "status": "pending",
+      "provider": "synthetic",
+      "product": {
+        "id": "SYN-D-DROPIN-PENDING",
+        "optionId": null,
+        "title": "Synthetic concert",
+        "imageUrl": null
+      },
+      "amount": {
+        "amount": "150.00",
+        "currency": "USD"
+      },
+      "holdExpiresAt": null,
+      "priceValidUntil": null,
+      "currentStep": null,
+      "nextAction": null,
+      "allowedActions": [],
+      "booking": {
+        "uuid": "1b3d5f7a-9c2e-4a4b-8d6e-0f2a4b6c8d0e",
+        "status": "pending"
+      },
+      "result": {
+        "title": "Awaiting confirmation",
+        "message": "We will let you know by push notification and email.",
+        "bookingUuid": "1b3d5f7a-9c2e-4a4b-8d6e-0f2a4b6c8d0e"
+      },
+      "fallback": {
+        "webUrl": "https://book.tripian.com/c/chk_01SYND0001",
+        "text": "Continue your booking on the web."
+      }
+    }
+  }
+}

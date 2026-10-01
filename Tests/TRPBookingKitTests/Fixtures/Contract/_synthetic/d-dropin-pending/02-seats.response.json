@@ -1,0 +1,85 @@
+{
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 200,
+    "success": true,
+    "message": null,
+    "UUID": "117be0f9-542c-4797-9a40-3b2ebbae28d1",
+    "data": {
+      "id": "chk_01SYND0001",
+      "status": "collecting_details",
+      "provider": "synthetic",
+      "product": {
+        "id": "SYN-D-DROPIN-PENDING",
+        "optionId": null,
+        "title": "Synthetic concert",
+        "imageUrl": null
+      },
+      "amount": {
+        "amount": "150.00",
+        "currency": "USD"
+      },
+      "holdExpiresAt": null,
+      "priceValidUntil": "2026-10-02T12:30:00Z",
+      "currentStep": {
+        "id": "review",
+        "title": "Review",
+        "subtitle": null,
+        "progress": {
+          "index": 2,
+          "count": 2
+        },
+        "blocks": [
+          {
+            "type": "summary",
+            "id": "summary",
+            "lines": [
+              {
+                "title": "2 × Seats",
+                "amount": {
+                  "amount": "150.00",
+                  "currency": "USD"
+                }
+              }
+            ],
+            "total": {
+              "amount": "150.00",
+              "currency": "USD"
+            }
+          },
+          {
+            "type": "consent",
+            "id": "terms",
+            "text": "I accept the terms of sale.",
+            "links": [
+              {
+                "title": "Terms",
+                "url": "https://www.tripian.com/terms"
+              }
+            ],
+            "required": true
+          }
+        ],
+        "primaryAction": {
+          "title": "Continue to payment"
+        }
+      },
+      "nextAction": null,
+      "allowedActions": [
+        "submit",
+        "back",
+        "cancel"
+      ],
+      "booking": null,
+      "result": null,
+      "fallback": {
+        "webUrl": "https://book.tripian.com/c/chk_01SYND0001",
+        "text": "Continue your booking on the web."
+      }
+    }
+  }
+}

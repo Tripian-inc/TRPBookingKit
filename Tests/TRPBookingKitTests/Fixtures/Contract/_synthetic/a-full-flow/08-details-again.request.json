@@ -1,0 +1,46 @@
+{
+  "method": "POST",
+  "path": "/tour-api/checkouts/chk_01SYNA0001/steps/details",
+  "headers": {
+    "x-api-key": "tripian-test-api-key",
+    "Authorization": "Bearer eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0LXVzZXIifQ.c2lnbmF0dXJl",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "Tripian-Booking-Version": "2026-10-01",
+    "Idempotency-Key": "6eff0391-2161-4441-967b-c1ea2ea19833"
+  },
+  "body": {
+    "answers": {
+      "lead.firstName": "Ada",
+      "lead.email": "ada@example.com",
+      "lead.phone": "+447700900123",
+      "newsletter": true,
+      "newsletterEmail": "ada.offers@example.com",
+      "pickup_type": "hotel",
+      "pickup": {
+        "ref": "hotel_123"
+      },
+      "pickup_time": "08:45",
+      "diet_pref": "other",
+      "allergies": [
+        "nuts"
+      ],
+      "dietary_notes": "No tree nuts; peanuts are fine.",
+      "t1.name": "Ada Lovelace",
+      "t1.birthDate": "1988-04-12",
+      "t1.age": 38,
+      "t1.nationality": "GB",
+      "t1.passport": "K1234567",
+      "t1.weight": {
+        "value": 72,
+        "unit": "kg"
+      },
+      "t2.name": "Charles Babbage",
+      "t2.age": 41,
+      "t3.name": "Byron Lovelace",
+      "t3.age": 9,
+      "t3.guardian": "Ada Lovelace"
+    },
+    "lang": "en"
+  }
+}

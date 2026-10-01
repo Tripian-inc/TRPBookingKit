@@ -1,0 +1,86 @@
+{
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 200,
+    "success": true,
+    "message": null,
+    "UUID": "02e5627c-b2ac-49d4-b5a7-fa998f3617bd",
+    "data": {
+      "id": "chk_01SYNA0001",
+      "status": "collecting_details",
+      "provider": "synthetic",
+      "product": {
+        "id": "SYN-HARBOUR-1",
+        "optionId": null,
+        "title": "Synthetic harbour cruise and tasting",
+        "imageUrl": "https://cdn.tripian.com/p/SYN-HARBOUR-1.jpg"
+      },
+      "amount": null,
+      "holdExpiresAt": null,
+      "priceValidUntil": null,
+      "currentStep": {
+        "id": "start",
+        "title": "When would you like to sail?",
+        "subtitle": null,
+        "progress": {
+          "index": 1,
+          "count": 4
+        },
+        "blocks": [
+          {
+            "type": "image",
+            "id": "hero",
+            "url": "https://cdn.tripian.com/p/SYN-HARBOUR-1-map.png",
+            "alt": "Route of the harbour cruise",
+            "aspectRatio": 1.7778,
+            "onUnsupported": "skip",
+            "requires": {
+              "image": "2026-10-01"
+            }
+          },
+          {
+            "type": "date",
+            "id": "date",
+            "mode": "available",
+            "range": {
+              "from": "2026-10-15",
+              "to": "2027-01-12"
+            },
+            "dates": [
+              "2026-10-15",
+              "2026-10-16",
+              "2026-10-17",
+              "2026-10-20"
+            ],
+            "onUnsupported": "fallback"
+          },
+          {
+            "type": "notice",
+            "id": "weather",
+            "tone": "info",
+            "text": "Departures may move by up to 30 minutes in strong wind.",
+            "onUnsupported": "skip"
+          }
+        ],
+        "primaryAction": {
+          "title": "Continue"
+        }
+      },
+      "nextAction": null,
+      "allowedActions": [
+        "submit",
+        "cancel"
+      ],
+      "booking": null,
+      "result": null,
+      "fallback": {
+        "webUrl": "https://book.tripian.com/c/chk_01SYNA0001",
+        "text": "Continue your booking on the web."
+      }
+    }
+  }
+}

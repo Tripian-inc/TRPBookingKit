@@ -1,0 +1,18 @@
+{
+  "method": "POST",
+  "path": "/tour-api/checkouts/chk_01J9ZT7P2N/steps/rate",
+  "headers": {
+    "x-api-key": "tripian-test-api-key",
+    "Authorization": "Bearer eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0LXVzZXIifQ.c2lnbmF0dXJl",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "Tripian-Booking-Version": "2026-10-01",
+    "Idempotency-Key": "2586b6fe-e406-4ade-b587-981741222a40"
+  },
+  "body": {
+    "answers": {
+      "rate": "RATE_STD"
+    },
+    "lang": "en"
+  }
+}

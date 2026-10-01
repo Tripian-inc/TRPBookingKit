@@ -1,0 +1,46 @@
+{
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 200,
+    "success": true,
+    "message": null,
+    "UUID": "07181c56-f16b-42a1-af05-efdb75d87dd7",
+    "data": {
+      "id": "chk_01J9ZV3R6Q",
+      "status": "pending",
+      "provider": "victory",
+      "product": {
+        "id": "TEVO-2817364",
+        "optionId": "TG_88122",
+        "title": "Hamilton on Broadway",
+        "imageUrl": "https://cdn.tripian.com/p/TEVO-2817364.jpg"
+      },
+      "amount": {
+        "amount": "212.40",
+        "currency": "USD"
+      },
+      "holdExpiresAt": null,
+      "priceValidUntil": null,
+      "currentStep": null,
+      "nextAction": null,
+      "allowedActions": [],
+      "booking": {
+        "uuid": "5c7e9a1b-3d4f-4b6a-8c2d-7e9f1a2b3c4d",
+        "status": "pending"
+      },
+      "result": {
+        "title": "Awaiting confirmation",
+        "message": "Ticket Evolution is confirming your order. We will let you know by push notification and email.",
+        "bookingUuid": "5c7e9a1b-3d4f-4b6a-8c2d-7e9f1a2b3c4d"
+      },
+      "fallback": {
+        "webUrl": "https://book.tripian.com/c/chk_01J9ZV3R6Q",
+        "text": "Continue your booking on the web."
+      }
+    }
+  }
+}

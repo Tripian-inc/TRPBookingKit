@@ -1,0 +1,48 @@
+{
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 200,
+    "success": true,
+    "message": null,
+    "UUID": "67e5da21-5ed6-4ab4-8a94-9f26ea3ed8f8",
+    "data": {
+      "id": "chk_01SYNG0001",
+      "status": "awaiting_payment",
+      "provider": "synthetic",
+      "product": {
+        "id": "SYN-FUTURE-1",
+        "optionId": null,
+        "title": "Synthetic future product",
+        "imageUrl": null
+      },
+      "amount": {
+        "amount": "10.00",
+        "currency": "EUR"
+      },
+      "holdExpiresAt": null,
+      "priceValidUntil": "2026-10-02T15:15:00Z",
+      "currentStep": null,
+      "nextAction": {
+        "id": "act_SYNG01",
+        "type": "wallet_pass_payment",
+        "params": {
+          "walletToken": "syn_wallet_g1"
+        },
+        "expiresAt": "2026-10-02T15:15:00Z"
+      },
+      "allowedActions": [
+        "cancel"
+      ],
+      "booking": null,
+      "result": null,
+      "fallback": {
+        "webUrl": "https://book.tripian.com/c/chk_01SYNG0001",
+        "text": "Continue your booking on the web."
+      }
+    }
+  }
+}

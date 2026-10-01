@@ -1,0 +1,21 @@
+{
+  "method": "POST",
+  "path": "/tour-api/checkouts/chk_01SYNA0001/steps/package",
+  "headers": {
+    "x-api-key": "tripian-test-api-key",
+    "Authorization": "Bearer eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0LXVzZXIifQ.c2lnbmF0dXJl",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "Tripian-Booking-Version": "2026-10-01",
+    "Idempotency-Key": "cf38d68e-6a42-4c64-a794-bcdcd701de82"
+  },
+  "body": {
+    "answers": {
+      "package": "PKG_TASTING",
+      "extras": [
+        "PHOTO"
+      ]
+    },
+    "lang": "en"
+  }
+}

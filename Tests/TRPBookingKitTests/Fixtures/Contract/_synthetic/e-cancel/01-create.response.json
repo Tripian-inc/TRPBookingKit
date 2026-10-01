@@ -1,0 +1,72 @@
+{
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 200,
+    "success": true,
+    "message": null,
+    "UUID": "0f4f1a34-4c6c-4d74-85c4-fa2ccd385c0b",
+    "data": {
+      "id": "chk_01SYNE0001",
+      "status": "collecting_details",
+      "provider": "synthetic",
+      "product": {
+        "id": "SYN-E-CANCEL",
+        "optionId": null,
+        "title": "Synthetic bike tour",
+        "imageUrl": null
+      },
+      "amount": null,
+      "holdExpiresAt": null,
+      "priceValidUntil": null,
+      "currentStep": {
+        "id": "tickets",
+        "title": "How many tickets?",
+        "subtitle": null,
+        "progress": {
+          "index": 1,
+          "count": 2
+        },
+        "blocks": [
+          {
+            "type": "quantity",
+            "id": "units",
+            "items": [
+              {
+                "unitId": "ADULT",
+                "title": "Adult",
+                "price": {
+                  "amount": "20.00",
+                  "currency": "EUR"
+                },
+                "min": 1,
+                "max": 6
+              }
+            ],
+            "total": {
+              "min": 1,
+              "max": 6
+            }
+          }
+        ],
+        "primaryAction": {
+          "title": "Continue"
+        }
+      },
+      "nextAction": null,
+      "allowedActions": [
+        "submit",
+        "cancel"
+      ],
+      "booking": null,
+      "result": null,
+      "fallback": {
+        "webUrl": "https://book.tripian.com/c/chk_01SYNE0001",
+        "text": "Continue your booking on the web."
+      }
+    }
+  }
+}

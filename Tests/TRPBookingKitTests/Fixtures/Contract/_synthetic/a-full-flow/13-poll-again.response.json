@@ -1,0 +1,46 @@
+{
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 200,
+    "success": true,
+    "message": null,
+    "UUID": "b8323e81-b2df-48c8-9071-600575d9d8ae",
+    "data": {
+      "id": "chk_01SYNA0001",
+      "status": "confirmed",
+      "provider": "synthetic",
+      "product": {
+        "id": "SYN-HARBOUR-1",
+        "optionId": "PKG_TASTING",
+        "title": "Synthetic harbour cruise and tasting",
+        "imageUrl": "https://cdn.tripian.com/p/SYN-HARBOUR-1.jpg"
+      },
+      "amount": {
+        "amount": "200.00",
+        "currency": "EUR"
+      },
+      "holdExpiresAt": null,
+      "priceValidUntil": null,
+      "currentStep": null,
+      "nextAction": null,
+      "allowedActions": [],
+      "booking": {
+        "uuid": "9d1f3b5c-7e2a-4c6d-8f0b-1a3c5e7f9b2d",
+        "status": "confirmed"
+      },
+      "result": {
+        "title": "Your booking is confirmed",
+        "message": "Your tickets have also been sent to your email address.",
+        "bookingUuid": "9d1f3b5c-7e2a-4c6d-8f0b-1a3c5e7f9b2d"
+      },
+      "fallback": {
+        "webUrl": "https://book.tripian.com/c/chk_01SYNA0001",
+        "text": "Continue your booking on the web."
+      }
+    }
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 200,
+    "success": true,
+    "message": null,
+    "UUID": "963bd679-cea9-4134-8d53-9c6e31f4b240",
+    "data": {
+      "id": "chk_01J9ZT7P2N",
+      "status": "collecting_details",
+      "provider": "toristy",
+      "product": {
+        "id": "TOR-PMI-CATHEDRAL",
+        "optionId": null,
+        "title": "Palma Cathedral and Old Town walking tour",
+        "imageUrl": "https://cdn.tripian.com/p/TOR-PMI-CATHEDRAL.jpg"
+      },
+      "amount": null,
+      "holdExpiresAt": null,
+      "priceValidUntil": null,
+      "currentStep": {
+        "id": "rate",
+        "title": "Choose a rate",
+        "subtitle": "15 October 2026, 10:00",
+        "progress": {
+          "index": 3,
+          "count": null
+        },
+        "blocks": [
+          {
+            "type": "choice",
+            "id": "rate",
+            "multiple": false,
+            "options": [
+              {
+                "value": "RATE_STD",
+                "title": "Standard group",
+                "subtitle": "From 25.00 EUR per person",
+                "price": {
+                  "amount": "25.00",
+                  "currency": "EUR"
+                }
+              },
+              {
+                "value": "RATE_PRIV",
+                "title": "Private group",
+                "subtitle": "Up to 8 people",
+                "price": {
+                  "amount": "180.00",
+                  "currency": "EUR"
+                }
+              }
+            ]
+          }
+        ],
+        "primaryAction": {
+          "title": "Continue"
+        }
+      },
+      "nextAction": null,
+      "allowedActions": [
+        "submit",
+        "back",
+        "cancel"
+      ],
+      "booking": null,
+      "result": null,
+      "fallback": {
+        "webUrl": "https://book.tripian.com/c/chk_01J9ZT7P2N",
+        "text": "Continue your booking on the web."
+      }
+    }
+  }
+}

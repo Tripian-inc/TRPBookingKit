@@ -1,0 +1,85 @@
+{
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 200,
+    "success": true,
+    "message": null,
+    "UUID": "0221041f-c80d-4bd1-8932-8643890bdae5",
+    "data": {
+      "id": "chk_01SYNB0001",
+      "status": "collecting_details",
+      "provider": "synthetic",
+      "product": {
+        "id": "SYN-B-STRIPE-RETRY",
+        "optionId": null,
+        "title": "Synthetic tea ceremony",
+        "imageUrl": null
+      },
+      "amount": {
+        "amount": "9600",
+        "currency": "JPY"
+      },
+      "holdExpiresAt": null,
+      "priceValidUntil": "2026-10-02T11:30:00Z",
+      "currentStep": {
+        "id": "review",
+        "title": "Review",
+        "subtitle": null,
+        "progress": {
+          "index": 2,
+          "count": 2
+        },
+        "blocks": [
+          {
+            "type": "summary",
+            "id": "summary",
+            "lines": [
+              {
+                "title": "2 × Guest",
+                "amount": {
+                  "amount": "9600",
+                  "currency": "JPY"
+                }
+              }
+            ],
+            "total": {
+              "amount": "9600",
+              "currency": "JPY"
+            }
+          },
+          {
+            "type": "consent",
+            "id": "terms",
+            "text": "I accept the terms of sale.",
+            "links": [
+              {
+                "title": "Terms",
+                "url": "https://www.tripian.com/terms"
+              }
+            ],
+            "required": true
+          }
+        ],
+        "primaryAction": {
+          "title": "Continue to payment"
+        }
+      },
+      "nextAction": null,
+      "allowedActions": [
+        "submit",
+        "back",
+        "cancel"
+      ],
+      "booking": null,
+      "result": null,
+      "fallback": {
+        "webUrl": "https://book.tripian.com/c/chk_01SYNB0001",
+        "text": "Continue your booking on the web."
+      }
+    }
+  }
+}

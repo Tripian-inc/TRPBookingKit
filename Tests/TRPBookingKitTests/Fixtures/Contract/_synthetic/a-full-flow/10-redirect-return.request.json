@@ -1,0 +1,18 @@
+{
+  "method": "POST",
+  "path": "/tour-api/checkouts/chk_01SYNA0001/actions/act_SYNA01",
+  "headers": {
+    "x-api-key": "tripian-test-api-key",
+    "Authorization": "Bearer eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0LXVzZXIifQ.c2lnbmF0dXJl",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "Tripian-Booking-Version": "2026-10-01",
+    "Idempotency-Key": "e2a5d8db-98ba-4cc7-8fc0-2f7bf3af1652"
+  },
+  "body": {
+    "result": {
+      "returnedUrl": "https://book.tripian.com/return/chk_01SYNA0001?session=ps_8842&state=authorised"
+    },
+    "lang": "en"
+  }
+}

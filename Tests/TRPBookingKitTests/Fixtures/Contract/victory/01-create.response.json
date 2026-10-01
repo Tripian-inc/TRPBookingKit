@@ -1,0 +1,88 @@
+{
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 200,
+    "success": true,
+    "message": null,
+    "UUID": "538b0599-eb4c-4ea5-9a79-1db267fb1b26",
+    "data": {
+      "id": "chk_01J9ZV3R6Q",
+      "status": "collecting_details",
+      "provider": "victory",
+      "product": {
+        "id": "TEVO-2817364",
+        "optionId": null,
+        "title": "Hamilton on Broadway",
+        "imageUrl": "https://cdn.tripian.com/p/TEVO-2817364.jpg"
+      },
+      "amount": null,
+      "holdExpiresAt": null,
+      "priceValidUntil": null,
+      "currentStep": {
+        "id": "group",
+        "title": "Choose your seats",
+        "subtitle": "15 October 2026, 19:00 · Richard Rodgers Theatre",
+        "progress": {
+          "index": 1,
+          "count": null
+        },
+        "blocks": [
+          {
+            "type": "choice",
+            "id": "group",
+            "multiple": false,
+            "options": [
+              {
+                "value": "TG_88121",
+                "title": "Orchestra, Row K",
+                "subtitle": "Seats together",
+                "price": {
+                  "amount": "129.00",
+                  "currency": "USD"
+                }
+              },
+              {
+                "value": "TG_88122",
+                "title": "Mezzanine, Row C",
+                "subtitle": "Seats together",
+                "price": {
+                  "amount": "89.00",
+                  "currency": "USD"
+                },
+                "badge": "Best value"
+              },
+              {
+                "value": "TG_88123",
+                "title": "Rear Mezzanine, Row M",
+                "subtitle": "Sold out",
+                "price": {
+                  "amount": "59.00",
+                  "currency": "USD"
+                },
+                "disabled": true
+              }
+            ]
+          }
+        ],
+        "primaryAction": {
+          "title": "Continue"
+        }
+      },
+      "nextAction": null,
+      "allowedActions": [
+        "submit",
+        "cancel"
+      ],
+      "booking": null,
+      "result": null,
+      "fallback": {
+        "webUrl": "https://book.tripian.com/c/chk_01J9ZV3R6Q",
+        "text": "Continue your booking on the web."
+      }
+    }
+  }
+}

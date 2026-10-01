@@ -1,0 +1,118 @@
+{
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 200,
+    "success": true,
+    "message": null,
+    "UUID": "5dd6fb4a-c1c9-4586-8fc5-2d841c2d9af8",
+    "data": {
+      "id": "chk_01SYNA0001",
+      "status": "collecting_details",
+      "provider": "synthetic",
+      "product": {
+        "id": "SYN-HARBOUR-1",
+        "optionId": null,
+        "title": "Synthetic harbour cruise and tasting",
+        "imageUrl": "https://cdn.tripian.com/p/SYN-HARBOUR-1.jpg"
+      },
+      "amount": null,
+      "holdExpiresAt": null,
+      "priceValidUntil": null,
+      "currentStep": {
+        "id": "package",
+        "title": "Choose a package",
+        "subtitle": "15 October 2026",
+        "progress": {
+          "index": 2,
+          "count": 4
+        },
+        "blocks": [
+          {
+            "type": "choice",
+            "id": "package",
+            "multiple": false,
+            "options": [
+              {
+                "value": "PKG_CRUISE",
+                "title": "Harbour cruise",
+                "subtitle": "2 hours",
+                "price": {
+                  "amount": "40.00",
+                  "currency": "EUR"
+                }
+              },
+              {
+                "value": "PKG_TASTING",
+                "title": "Cruise and tasting",
+                "subtitle": "3 hours",
+                "price": {
+                  "amount": "65.00",
+                  "currency": "EUR"
+                },
+                "badge": "Popular"
+              },
+              {
+                "value": "PKG_SUNSET",
+                "title": "Sunset cruise",
+                "subtitle": "Sold out",
+                "price": {
+                  "amount": "80.00",
+                  "currency": "EUR"
+                },
+                "disabled": true
+              }
+            ]
+          },
+          {
+            "type": "choice",
+            "id": "extras",
+            "multiple": true,
+            "options": [
+              {
+                "value": "PHOTO",
+                "title": "Photo package",
+                "price": {
+                  "amount": "15.00",
+                  "currency": "EUR"
+                }
+              },
+              {
+                "value": "BLANKET",
+                "title": "Blanket hire",
+                "price": {
+                  "amount": "5.00",
+                  "currency": "EUR"
+                }
+              }
+            ]
+          },
+          {
+            "type": "notice",
+            "id": "lifejackets",
+            "tone": "critical",
+            "text": "Life jackets must be worn on the open deck."
+          }
+        ],
+        "primaryAction": {
+          "title": "Continue"
+        }
+      },
+      "nextAction": null,
+      "allowedActions": [
+        "submit",
+        "back",
+        "cancel"
+      ],
+      "booking": null,
+      "result": null,
+      "fallback": {
+        "webUrl": "https://book.tripian.com/c/chk_01SYNA0001",
+        "text": "Continue your booking on the web."
+      }
+    }
+  }
+}

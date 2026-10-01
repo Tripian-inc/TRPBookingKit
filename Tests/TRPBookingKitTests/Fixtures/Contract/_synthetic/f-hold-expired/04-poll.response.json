@@ -1,0 +1,46 @@
+{
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 200,
+    "success": true,
+    "message": null,
+    "UUID": "58a690d0-b660-474d-adba-72b10005ad1e",
+    "data": {
+      "id": "chk_01SYNF0001",
+      "status": "expired",
+      "provider": "synthetic",
+      "product": {
+        "id": "SYN-F-HOLD-EXPIRED",
+        "optionId": null,
+        "title": "Synthetic walking tour",
+        "imageUrl": null
+      },
+      "amount": {
+        "amount": "50.00",
+        "currency": "EUR"
+      },
+      "holdExpiresAt": null,
+      "priceValidUntil": null,
+      "currentStep": null,
+      "nextAction": null,
+      "allowedActions": [],
+      "booking": {
+        "uuid": "4f6a8c0e-2b3d-4e5f-a7b9-c1d3e5f7a9b1",
+        "status": "expired"
+      },
+      "result": {
+        "title": "Your reservation has expired",
+        "message": "The time to complete this booking has passed. Please start again.",
+        "bookingUuid": "4f6a8c0e-2b3d-4e5f-a7b9-c1d3e5f7a9b1"
+      },
+      "fallback": {
+        "webUrl": "https://book.tripian.com/c/chk_01SYNF0001",
+        "text": "Continue your booking on the web."
+      }
+    }
+  }
+}

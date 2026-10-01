@@ -1,0 +1,121 @@
+{
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 200,
+    "success": true,
+    "message": null,
+    "UUID": "acd3e3ff-cf71-43e8-bcec-953dd6757b13",
+    "data": {
+      "id": "chk_01SYNA0001",
+      "status": "collecting_details",
+      "provider": "synthetic",
+      "product": {
+        "id": "SYN-HARBOUR-1",
+        "optionId": "PKG_TASTING",
+        "title": "Synthetic harbour cruise and tasting",
+        "imageUrl": "https://cdn.tripian.com/p/SYN-HARBOUR-1.jpg"
+      },
+      "amount": null,
+      "holdExpiresAt": null,
+      "priceValidUntil": null,
+      "currentStep": {
+        "id": "guests",
+        "title": "Who is coming?",
+        "subtitle": null,
+        "progress": {
+          "index": 3,
+          "count": null
+        },
+        "blocks": [
+          {
+            "type": "quantity",
+            "id": "units",
+            "items": [
+              {
+                "unitId": "ADULT",
+                "title": "Adult",
+                "subtitle": "Age 18+",
+                "price": {
+                  "amount": "65.00",
+                  "currency": "EUR"
+                },
+                "min": 1,
+                "max": 8
+              },
+              {
+                "unitId": "CHILD",
+                "title": "Child",
+                "subtitle": "Age 4–17",
+                "price": {
+                  "amount": "40.00",
+                  "currency": "EUR"
+                },
+                "min": 0,
+                "max": 8
+              },
+              {
+                "unitId": "CABIN",
+                "title": "Private cabin",
+                "subtitle": "Booked in pairs",
+                "price": {
+                  "amount": "30.00",
+                  "currency": "EUR"
+                },
+                "min": 0,
+                "max": 4,
+                "allowed": [
+                  0,
+                  2,
+                  4
+                ]
+              }
+            ],
+            "total": {
+              "min": 1,
+              "max": 8
+            }
+          },
+          {
+            "type": "field",
+            "id": "childSeat",
+            "fieldType": "boolean",
+            "label": "I need a child seat",
+            "required": false,
+            "scope": "booking",
+            "defaultValue": false,
+            "visibleWhen": {
+              "all": [
+                {
+                  "field": "units.CHILD",
+                  "op": "gt",
+                  "values": [
+                    0
+                  ]
+                }
+              ]
+            }
+          }
+        ],
+        "primaryAction": {
+          "title": "Continue"
+        }
+      },
+      "nextAction": null,
+      "allowedActions": [
+        "submit",
+        "back",
+        "cancel"
+      ],
+      "booking": null,
+      "result": null,
+      "fallback": {
+        "webUrl": "https://book.tripian.com/c/chk_01SYNA0001",
+        "text": "Continue your booking on the web."
+      }
+    }
+  }
+}

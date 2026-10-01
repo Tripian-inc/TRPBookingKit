@@ -1,0 +1,22 @@
+{
+  "method": "POST",
+  "path": "/tour-api/checkouts/chk_01SYNB0001/steps/review",
+  "headers": {
+    "x-api-key": "tripian-test-api-key",
+    "Authorization": "Bearer eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0LXVzZXIifQ.c2lnbmF0dXJl",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "Tripian-Booking-Version": "2026-10-01",
+    "Idempotency-Key": "d0890980-d974-4abd-a511-acd9cb44c78d"
+  },
+  "body": {
+    "answers": {
+      "terms": true
+    },
+    "expectedAmount": {
+      "amount": "9600",
+      "currency": "JPY"
+    },
+    "lang": "en"
+  }
+}

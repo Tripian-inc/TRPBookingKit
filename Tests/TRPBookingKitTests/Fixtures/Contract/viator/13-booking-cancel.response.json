@@ -1,0 +1,67 @@
+{
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 200,
+    "success": true,
+    "message": "Your booking has been cancelled.",
+    "UUID": "f1b0a9c8-6d7e-4f8a-9ba9-2d3e4f5a6b70",
+    "data": {
+      "uuid": "3f6c1a9e-8d2b-4b7a-a1c4-5e9f0d2b7c11",
+      "status": "cancelled",
+      "provider": "viator",
+      "providerReference": "BR-1122334455",
+      "product": {
+        "id": "5010BCN_SAGRADA",
+        "optionId": "TG1",
+        "title": "Sagrada Família guided tour",
+        "imageUrl": "https://cdn.tripian.com/p/5010BCN_SAGRADA.jpg"
+      },
+      "units": {
+        "ADULT": 2,
+        "CHILD": 1
+      },
+      "start": {
+        "date": "2026-10-15",
+        "time": "10:30",
+        "timezone": "Europe/Madrid"
+      },
+      "durationMinutes": 90,
+      "meetingPoint": {
+        "name": "Sagrada Família, Carrer de la Marina entrance",
+        "address": "Carrer de Mallorca 401, 08013 Barcelona",
+        "lat": 41.4036,
+        "lng": 2.1744
+      },
+      "amount": {
+        "amount": "145.00",
+        "currency": "EUR"
+      },
+      "utcExpiresAt": null,
+      "vouchers": [],
+      "cancellation": {
+        "allowed": false,
+        "deadline": null,
+        "refund": "full",
+        "refundAmount": {
+          "amount": "145.00",
+          "currency": "EUR"
+        }
+      },
+      "refund": {
+        "status": "pending",
+        "amount": {
+          "amount": "145.00",
+          "currency": "EUR"
+        }
+      },
+      "contact": {
+        "name": "Cem Yilmaz",
+        "email": "cem@example.com"
+      }
+    }
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "status": 410,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 410,
+    "success": false,
+    "message": "Your reservation has expired.",
+    "UUID": "b731f880-899c-4cec-b2cc-454ffb9ab0df",
+    "data": {
+      "code": "HOLD_EXPIRED",
+      "errors": [],
+      "retryable": false,
+      "checkout": {
+        "id": "chk_01J9ZT7P2N",
+        "status": "expired",
+        "provider": "toristy",
+        "product": {
+          "id": "TOR-PMI-CATHEDRAL",
+          "optionId": "RATE_STD",
+          "title": "Palma Cathedral and Old Town walking tour",
+          "imageUrl": "https://cdn.tripian.com/p/TOR-PMI-CATHEDRAL.jpg"
+        },
+        "amount": {
+          "amount": "62.50",
+          "currency": "EUR"
+        },
+        "holdExpiresAt": null,
+        "priceValidUntil": null,
+        "currentStep": null,
+        "nextAction": null,
+        "allowedActions": [],
+        "booking": {
+          "uuid": "8b2e4c6a-1d3f-4a5b-9c7d-0e1f2a3b4c5d",
+          "status": "expired"
+        },
+        "result": {
+          "title": "Your reservation has expired",
+          "message": "The 30 minutes to complete this booking have passed. Please start again.",
+          "bookingUuid": "8b2e4c6a-1d3f-4a5b-9c7d-0e1f2a3b4c5d"
+        },
+        "fallback": {
+          "webUrl": "https://book.tripian.com/c/chk_01J9ZT7P2N",
+          "text": "Continue your booking on the web."
+        }
+      }
+    }
+  }
+}

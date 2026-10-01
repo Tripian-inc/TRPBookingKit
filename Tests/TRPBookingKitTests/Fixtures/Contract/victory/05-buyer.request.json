@@ -1,0 +1,31 @@
+{
+  "method": "POST",
+  "path": "/tour-api/checkouts/chk_01J9ZV3R6Q/steps/buyer",
+  "headers": {
+    "x-api-key": "tripian-test-api-key",
+    "Authorization": "Bearer eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0LXVzZXIifQ.c2lnbmF0dXJl",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "Tripian-Booking-Version": "2026-10-01",
+    "Idempotency-Key": "7d2c95bd-80c8-4819-a29a-91d02b5217d1"
+  },
+  "body": {
+    "answers": {
+      "buyer.firstName": "Maya",
+      "buyer.lastName": "Brooks",
+      "buyer.email": "maya@example.com",
+      "buyer.phone": "+12125550143",
+      "billing.address1": "350 W 50th St",
+      "billing.city": "New York",
+      "billing.postalCode": "10019",
+      "billing.country": "US",
+      "billing.state": "NY",
+      "terms": true
+    },
+    "expectedAmount": {
+      "amount": "212.40",
+      "currency": "USD"
+    },
+    "lang": "en"
+  }
+}

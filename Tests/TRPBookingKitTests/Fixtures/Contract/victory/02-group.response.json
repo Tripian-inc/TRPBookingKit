@@ -1,0 +1,79 @@
+{
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 200,
+    "success": true,
+    "message": null,
+    "UUID": "2b27467f-7064-4982-a3b7-f7b909881f43",
+    "data": {
+      "id": "chk_01J9ZV3R6Q",
+      "status": "collecting_details",
+      "provider": "victory",
+      "product": {
+        "id": "TEVO-2817364",
+        "optionId": "TG_88122",
+        "title": "Hamilton on Broadway",
+        "imageUrl": "https://cdn.tripian.com/p/TEVO-2817364.jpg"
+      },
+      "amount": null,
+      "holdExpiresAt": null,
+      "priceValidUntil": null,
+      "currentStep": {
+        "id": "quantity",
+        "title": "How many tickets?",
+        "subtitle": null,
+        "progress": {
+          "index": 2,
+          "count": null
+        },
+        "blocks": [
+          {
+            "type": "quantity",
+            "id": "units",
+            "items": [
+              {
+                "unitId": "TICKET",
+                "title": "Tickets",
+                "subtitle": "Mezzanine, Row C",
+                "price": {
+                  "amount": "89.00",
+                  "currency": "USD"
+                },
+                "min": 2,
+                "max": 6,
+                "allowed": [
+                  2,
+                  4,
+                  6
+                ]
+              }
+            ],
+            "total": {
+              "min": 2,
+              "max": 6
+            }
+          }
+        ],
+        "primaryAction": {
+          "title": "Continue"
+        }
+      },
+      "nextAction": null,
+      "allowedActions": [
+        "submit",
+        "back",
+        "cancel"
+      ],
+      "booking": null,
+      "result": null,
+      "fallback": {
+        "webUrl": "https://book.tripian.com/c/chk_01J9ZV3R6Q",
+        "text": "Continue your booking on the web."
+      }
+    }
+  }
+}

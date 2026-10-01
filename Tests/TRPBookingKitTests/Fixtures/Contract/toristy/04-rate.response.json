@@ -1,0 +1,104 @@
+{
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 200,
+    "success": true,
+    "message": null,
+    "UUID": "a9aa4026-0228-49ee-be9c-27ba5935c64e",
+    "data": {
+      "id": "chk_01J9ZT7P2N",
+      "status": "collecting_details",
+      "provider": "toristy",
+      "product": {
+        "id": "TOR-PMI-CATHEDRAL",
+        "optionId": "RATE_STD",
+        "title": "Palma Cathedral and Old Town walking tour",
+        "imageUrl": "https://cdn.tripian.com/p/TOR-PMI-CATHEDRAL.jpg"
+      },
+      "amount": null,
+      "holdExpiresAt": null,
+      "priceValidUntil": null,
+      "currentStep": {
+        "id": "travelers",
+        "title": "Number of travelers",
+        "subtitle": null,
+        "progress": {
+          "index": 4,
+          "count": null
+        },
+        "blocks": [
+          {
+            "type": "quantity",
+            "id": "units",
+            "items": [
+              {
+                "unitId": "ADULT",
+                "title": "Adult",
+                "subtitle": "Age 16+",
+                "price": {
+                  "amount": "25.00",
+                  "currency": "EUR"
+                },
+                "min": 0,
+                "max": 15
+              },
+              {
+                "unitId": "CHILD",
+                "title": "Child",
+                "subtitle": "Age 6–15",
+                "price": {
+                  "amount": "12.50",
+                  "currency": "EUR"
+                },
+                "min": 0,
+                "max": 15
+              }
+            ],
+            "total": {
+              "min": 1,
+              "max": 15
+            }
+          },
+          {
+            "type": "summary",
+            "id": "estimate",
+            "lines": [
+              {
+                "title": "Adult",
+                "detail": "25.00 EUR per person"
+              },
+              {
+                "title": "Child",
+                "detail": "12.50 EUR per person"
+              }
+            ],
+            "total": {
+              "amount": "0.00",
+              "currency": "EUR"
+            },
+            "note": "The estimate updates as you choose travelers."
+          }
+        ],
+        "primaryAction": {
+          "title": "Continue"
+        }
+      },
+      "nextAction": null,
+      "allowedActions": [
+        "submit",
+        "back",
+        "cancel"
+      ],
+      "booking": null,
+      "result": null,
+      "fallback": {
+        "webUrl": "https://book.tripian.com/c/chk_01J9ZT7P2N",
+        "text": "Continue your booking on the web."
+      }
+    }
+  }
+}

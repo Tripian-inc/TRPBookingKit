@@ -1,0 +1,25 @@
+{
+  "method": "POST",
+  "path": "/tour-api/checkouts/chk_01J9ZT7P2N/steps/details",
+  "headers": {
+    "x-api-key": "tripian-test-api-key",
+    "Authorization": "Bearer eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0LXVzZXIifQ.c2lnbmF0dXJl",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "Tripian-Booking-Version": "2026-10-01",
+    "Idempotency-Key": "44541f3a-3c85-416c-8886-482bf44b6c1a"
+  },
+  "body": {
+    "answers": {
+      "lead.firstName": "Elif",
+      "lead.lastName": "Demir",
+      "lead.email": "elif.demir@example.com",
+      "lead.phone": "+905551112233",
+      "t1.fullName": "Elif Demir",
+      "t2.fullName": "Can Demir",
+      "t3.fullName": "Deniz Demir",
+      "t3.birthDate": "2017-05-09"
+    },
+    "lang": "en"
+  }
+}

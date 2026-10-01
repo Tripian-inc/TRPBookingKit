@@ -1,0 +1,24 @@
+{
+  "method": "POST",
+  "path": "/tour-api/checkouts/chk_01J9ZQ4M8K/steps/details",
+  "headers": {
+    "x-api-key": "tripian-test-api-key",
+    "Authorization": "Bearer eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0LXVzZXIifQ.c2lnbmF0dXJl",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "Tripian-Booking-Version": "2026-10-01",
+    "Idempotency-Key": "8e3b0d2c-4a1f-4b7e-a5c9-6d7e8f9a0b13"
+  },
+  "body": {
+    "answers": {
+      "lead.firstName": "Cem",
+      "lead.lastName": "Yilmaz",
+      "lead.email": "cem@example.com",
+      "lead.phone": "+905321234567",
+      "pickup": {
+        "text": "Cruise terminal, gate A"
+      }
+    },
+    "lang": "en"
+  }
+}

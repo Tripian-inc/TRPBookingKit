@@ -1,0 +1,99 @@
+{
+  "status": 409,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 409,
+    "success": false,
+    "message": "These seats have just sold out.",
+    "UUID": "68cca44c-240f-4897-b357-15a61c4d6967",
+    "data": {
+      "code": "SOLD_OUT",
+      "errors": [],
+      "retryable": false,
+      "checkout": {
+        "id": "chk_01J9ZV3R6Q",
+        "status": "collecting_details",
+        "provider": "victory",
+        "product": {
+          "id": "TEVO-2817364",
+          "optionId": null,
+          "title": "Hamilton on Broadway",
+          "imageUrl": "https://cdn.tripian.com/p/TEVO-2817364.jpg"
+        },
+        "amount": null,
+        "holdExpiresAt": null,
+        "priceValidUntil": null,
+        "currentStep": {
+          "id": "group",
+          "title": "Choose your seats",
+          "subtitle": "15 October 2026, 19:00 · Richard Rodgers Theatre",
+          "progress": {
+            "index": 1,
+            "count": null
+          },
+          "blocks": [
+            {
+              "type": "choice",
+              "id": "group",
+              "multiple": false,
+              "options": [
+                {
+                  "value": "TG_88121",
+                  "title": "Orchestra, Row K",
+                  "subtitle": "Seats together",
+                  "price": {
+                    "amount": "129.00",
+                    "currency": "USD"
+                  }
+                },
+                {
+                  "value": "TG_88122",
+                  "title": "Mezzanine, Row C",
+                  "subtitle": "Sold out",
+                  "price": {
+                    "amount": "89.00",
+                    "currency": "USD"
+                  },
+                  "disabled": true
+                },
+                {
+                  "value": "TG_88123",
+                  "title": "Rear Mezzanine, Row M",
+                  "subtitle": "Sold out",
+                  "price": {
+                    "amount": "59.00",
+                    "currency": "USD"
+                  },
+                  "disabled": true
+                }
+              ]
+            },
+            {
+              "type": "notice",
+              "id": "sold-out",
+              "tone": "warning",
+              "text": "The seats you chose are no longer available. Please choose other seats."
+            }
+          ],
+          "primaryAction": {
+            "title": "Continue"
+          }
+        },
+        "nextAction": null,
+        "allowedActions": [
+          "submit",
+          "cancel"
+        ],
+        "booking": null,
+        "result": null,
+        "fallback": {
+          "webUrl": "https://book.tripian.com/c/chk_01J9ZV3R6Q",
+          "text": "Continue your booking on the web."
+        }
+      }
+    }
+  }
+}

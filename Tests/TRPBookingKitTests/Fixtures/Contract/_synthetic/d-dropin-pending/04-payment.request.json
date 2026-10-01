@@ -1,0 +1,19 @@
+{
+  "method": "POST",
+  "path": "/tour-api/checkouts/chk_01SYND0001/actions/act_SYND01",
+  "headers": {
+    "x-api-key": "tripian-test-api-key",
+    "Authorization": "Bearer eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0LXVzZXIifQ.c2lnbmF0dXJl",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "Tripian-Booking-Version": "2026-10-01",
+    "Idempotency-Key": "0d533cb9-77f7-44a6-a5d8-93b32607d64c"
+  },
+  "body": {
+    "result": {
+      "nonce": "syn_nonce_d1",
+      "deviceData": "{\"correlation_id\":\"syn-d1\"}"
+    },
+    "lang": "en"
+  }
+}

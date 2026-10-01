@@ -1,0 +1,174 @@
+{
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 200,
+    "success": true,
+    "message": null,
+    "UUID": "585b2fa9-808c-47a3-a869-56e37b9ca5af",
+    "data": {
+      "id": "chk_01J9ZV3R6Q",
+      "status": "collecting_details",
+      "provider": "victory",
+      "product": {
+        "id": "TEVO-2817364",
+        "optionId": "TG_88122",
+        "title": "Hamilton on Broadway",
+        "imageUrl": "https://cdn.tripian.com/p/TEVO-2817364.jpg"
+      },
+      "amount": {
+        "amount": "212.40",
+        "currency": "USD"
+      },
+      "holdExpiresAt": null,
+      "priceValidUntil": "2026-10-02T16:18:00Z",
+      "currentStep": {
+        "id": "buyer",
+        "title": "Buyer and billing",
+        "subtitle": null,
+        "progress": {
+          "index": 4,
+          "count": 4
+        },
+        "blocks": [
+          {
+            "type": "field",
+            "id": "buyer.firstName",
+            "fieldType": "text",
+            "label": "First name",
+            "required": true,
+            "scope": "booking",
+            "autofill": "givenName"
+          },
+          {
+            "type": "field",
+            "id": "buyer.lastName",
+            "fieldType": "text",
+            "label": "Last name",
+            "required": true,
+            "scope": "booking",
+            "autofill": "familyName"
+          },
+          {
+            "type": "field",
+            "id": "buyer.email",
+            "fieldType": "email",
+            "label": "Email",
+            "required": true,
+            "scope": "booking",
+            "autofill": "email"
+          },
+          {
+            "type": "field",
+            "id": "buyer.phone",
+            "fieldType": "phone",
+            "label": "Phone",
+            "required": true,
+            "scope": "booking",
+            "autofill": "tel"
+          },
+          {
+            "type": "field",
+            "id": "billing.address1",
+            "fieldType": "text",
+            "label": "Billing address",
+            "required": true,
+            "scope": "booking",
+            "autofill": "streetAddressLine1"
+          },
+          {
+            "type": "field",
+            "id": "billing.city",
+            "fieldType": "text",
+            "label": "City",
+            "required": true,
+            "scope": "booking",
+            "autofill": "addressCity"
+          },
+          {
+            "type": "field",
+            "id": "billing.postalCode",
+            "fieldType": "text",
+            "label": "Postal code",
+            "required": true,
+            "scope": "booking",
+            "autofill": "postalCode"
+          },
+          {
+            "type": "field",
+            "id": "billing.country",
+            "fieldType": "country",
+            "label": "Country",
+            "required": true,
+            "scope": "booking",
+            "defaultValue": "US"
+          },
+          {
+            "type": "field",
+            "id": "billing.state",
+            "fieldType": "select",
+            "control": "dropdown",
+            "label": "State",
+            "required": true,
+            "scope": "booking",
+            "options": [
+              {
+                "value": "NY",
+                "title": "New York"
+              },
+              {
+                "value": "NJ",
+                "title": "New Jersey"
+              },
+              {
+                "value": "CA",
+                "title": "California"
+              }
+            ],
+            "visibleWhen": {
+              "all": [
+                {
+                  "field": "billing.country",
+                  "op": "in",
+                  "values": [
+                    "US"
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "type": "consent",
+            "id": "terms",
+            "text": "I accept Ticket Evolution's terms of sale.",
+            "links": [
+              {
+                "title": "Terms of sale",
+                "url": "https://www.ticketevolution.com/terms"
+              }
+            ],
+            "required": true
+          }
+        ],
+        "primaryAction": {
+          "title": "Continue to payment"
+        }
+      },
+      "nextAction": null,
+      "allowedActions": [
+        "submit",
+        "back",
+        "cancel"
+      ],
+      "booking": null,
+      "result": null,
+      "fallback": {
+        "webUrl": "https://book.tripian.com/c/chk_01J9ZV3R6Q",
+        "text": "Continue your booking on the web."
+      }
+    }
+  }
+}

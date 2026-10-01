@@ -1,0 +1,107 @@
+{
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 200,
+    "success": true,
+    "message": null,
+    "UUID": "bc11492f-9bdd-4bf8-ba1d-291745a63b39",
+    "data": {
+      "id": "chk_01J9ZQ4M8K",
+      "status": "collecting_details",
+      "provider": "viator",
+      "product": {
+        "id": "5010BCN_SAGRADA",
+        "optionId": "TG1",
+        "title": "Sagrada Família guided tour",
+        "imageUrl": "https://cdn.tripian.com/p/5010BCN_SAGRADA.jpg"
+      },
+      "amount": {
+        "amount": "145.00",
+        "currency": "EUR"
+      },
+      "holdExpiresAt": null,
+      "priceValidUntil": null,
+      "currentStep": {
+        "id": "details",
+        "title": "Contact details",
+        "subtitle": null,
+        "progress": {
+          "index": 4,
+          "count": 5
+        },
+        "blocks": [
+          {
+            "type": "field",
+            "id": "lead.firstName",
+            "fieldType": "text",
+            "label": "First name",
+            "required": true,
+            "scope": "booking",
+            "autofill": "givenName"
+          },
+          {
+            "type": "field",
+            "id": "lead.lastName",
+            "fieldType": "text",
+            "label": "Last name",
+            "required": true,
+            "scope": "booking",
+            "autofill": "familyName"
+          },
+          {
+            "type": "field",
+            "id": "lead.email",
+            "fieldType": "email",
+            "label": "Email",
+            "required": true,
+            "scope": "booking",
+            "autofill": "email"
+          },
+          {
+            "type": "field",
+            "id": "lead.phone",
+            "fieldType": "phone",
+            "label": "Phone",
+            "required": true,
+            "scope": "booking",
+            "autofill": "tel"
+          },
+          {
+            "type": "field",
+            "id": "pickup",
+            "fieldType": "locationOrText",
+            "label": "Pickup location",
+            "required": false,
+            "scope": "booking",
+            "options": [
+              {
+                "value": "hotel_123",
+                "title": "Hotel Arts Barcelona"
+              }
+            ],
+            "degradesTo": "text"
+          }
+        ],
+        "primaryAction": {
+          "title": "Continue"
+        }
+      },
+      "nextAction": null,
+      "allowedActions": [
+        "submit",
+        "back",
+        "cancel"
+      ],
+      "booking": null,
+      "result": null,
+      "fallback": {
+        "webUrl": "https://book.tripian.com/c/chk_01J9ZQ4M8K",
+        "text": "Continue your booking on the web."
+      }
+    }
+  }
+}

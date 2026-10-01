@@ -1,0 +1,56 @@
+{
+  "status": 402,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 402,
+    "success": false,
+    "message": "Your card was declined. Please try another card.",
+    "UUID": "fce1fbdb-914f-4c6d-8a94-ff481b0e251c",
+    "data": {
+      "code": "PAYMENT_DECLINED",
+      "errors": [],
+      "retryable": false,
+      "checkout": {
+        "id": "chk_01SYNC0001",
+        "status": "awaiting_payment",
+        "provider": "synthetic",
+        "product": {
+          "id": "SYN-C-HOSTED-FORM-DECLINED",
+          "optionId": null,
+          "title": "Synthetic museum entry",
+          "imageUrl": null
+        },
+        "amount": {
+          "amount": "60.00",
+          "currency": "EUR"
+        },
+        "holdExpiresAt": "2026-10-02T11:45:00Z",
+        "priceValidUntil": "2026-10-02T11:45:00Z",
+        "currentStep": null,
+        "nextAction": {
+          "id": "act_SYNC02",
+          "type": "provider_hosted_form",
+          "params": {
+            "paymentSessionToken": "syn_pst_c2"
+          },
+          "expiresAt": "2026-10-02T11:45:00Z"
+        },
+        "allowedActions": [
+          "cancel"
+        ],
+        "booking": {
+          "uuid": "6e8a0c2e-4f1b-4d3a-8b5c-9d1e3f5a7b9c",
+          "status": "on_hold"
+        },
+        "result": null,
+        "fallback": {
+          "webUrl": "https://book.tripian.com/c/chk_01SYNC0001",
+          "text": "Continue your booking on the web."
+        }
+      }
+    }
+  }
+}

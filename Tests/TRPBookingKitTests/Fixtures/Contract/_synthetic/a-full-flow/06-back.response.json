@@ -1,0 +1,539 @@
+{
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 200,
+    "success": true,
+    "message": null,
+    "UUID": "0ff07913-ebb9-4a3c-ab36-7bcbaa618664",
+    "data": {
+      "id": "chk_01SYNA0001",
+      "status": "collecting_details",
+      "provider": "synthetic",
+      "product": {
+        "id": "SYN-HARBOUR-1",
+        "optionId": "PKG_TASTING",
+        "title": "Synthetic harbour cruise and tasting",
+        "imageUrl": "https://cdn.tripian.com/p/SYN-HARBOUR-1.jpg"
+      },
+      "amount": {
+        "amount": "200.00",
+        "currency": "EUR"
+      },
+      "holdExpiresAt": "2026-10-02T10:20:00Z",
+      "priceValidUntil": "2026-10-02T10:50:00Z",
+      "currentStep": {
+        "id": "details",
+        "title": "Guest details",
+        "subtitle": null,
+        "progress": {
+          "index": 4,
+          "count": 5
+        },
+        "blocks": [
+          {
+            "type": "field",
+            "id": "lead.firstName",
+            "fieldType": "text",
+            "label": "First name",
+            "required": true,
+            "scope": "booking",
+            "autofill": "givenName",
+            "validation": {
+              "minLength": 1,
+              "maxLength": 50,
+              "message": "Enter between 1 and 50 characters."
+            },
+            "defaultValue": "Ada"
+          },
+          {
+            "type": "field",
+            "id": "lead.email",
+            "fieldType": "email",
+            "label": "Email",
+            "required": true,
+            "scope": "booking",
+            "autofill": "email",
+            "placeholder": "name@example.com",
+            "defaultValue": "ada@example.com"
+          },
+          {
+            "type": "field",
+            "id": "lead.phone",
+            "fieldType": "phone",
+            "label": "Mobile phone",
+            "hint": "We text you if the departure moves.",
+            "required": true,
+            "scope": "booking",
+            "autofill": "tel",
+            "defaultValue": "+447700900123"
+          },
+          {
+            "type": "field",
+            "id": "newsletter",
+            "fieldType": "boolean",
+            "label": "Send me offers",
+            "required": false,
+            "scope": "booking",
+            "defaultValue": true
+          },
+          {
+            "type": "field",
+            "id": "newsletterEmail",
+            "fieldType": "email",
+            "label": "Email for offers",
+            "required": false,
+            "scope": "booking",
+            "visibleWhen": {
+              "all": [
+                {
+                  "field": "newsletter",
+                  "op": "eq",
+                  "values": [
+                    true
+                  ]
+                }
+              ]
+            },
+            "defaultValue": "ada.offers@example.com"
+          },
+          {
+            "type": "field",
+            "id": "pickup_type",
+            "fieldType": "select",
+            "control": "segmented",
+            "label": "Pickup",
+            "required": true,
+            "scope": "booking",
+            "options": [
+              {
+                "value": "hotel",
+                "title": "From my hotel"
+              },
+              {
+                "value": "port",
+                "title": "From the cruise port"
+              },
+              {
+                "value": "none",
+                "title": "I will get there myself"
+              }
+            ],
+            "defaultValue": "hotel"
+          },
+          {
+            "type": "field",
+            "id": "pickup",
+            "fieldType": "locationOrText",
+            "label": "Pickup location",
+            "required": false,
+            "scope": "booking",
+            "options": [
+              {
+                "value": "hotel_123",
+                "title": "Hotel Arts Barcelona"
+              },
+              {
+                "value": "port_terminal_a",
+                "title": "Cruise terminal A"
+              }
+            ],
+            "visibleWhen": {
+              "all": [
+                {
+                  "field": "pickup_type",
+                  "op": "in",
+                  "values": [
+                    "hotel",
+                    "port"
+                  ]
+                }
+              ]
+            },
+            "requiredWhen": {
+              "any": [
+                {
+                  "field": "pickup_type",
+                  "op": "eq",
+                  "values": [
+                    "hotel"
+                  ]
+                },
+                {
+                  "field": "pickup_type",
+                  "op": "eq",
+                  "values": [
+                    "port"
+                  ]
+                }
+              ]
+            },
+            "degradesTo": "text",
+            "defaultValue": {
+              "ref": "hotel_123"
+            }
+          },
+          {
+            "type": "field",
+            "id": "pickup_time",
+            "fieldType": "time",
+            "label": "Preferred pickup time",
+            "required": false,
+            "scope": "booking",
+            "visibleWhen": {
+              "all": [
+                {
+                  "field": "pickup_type",
+                  "op": "notIn",
+                  "values": [
+                    "none"
+                  ]
+                },
+                {
+                  "field": "pickup",
+                  "op": "exists"
+                }
+              ]
+            },
+            "degradesTo": "text",
+            "defaultValue": "08:45"
+          },
+          {
+            "type": "field",
+            "id": "diet_pref",
+            "fieldType": "select",
+            "control": "dropdown",
+            "label": "Diet",
+            "required": true,
+            "scope": "booking",
+            "options": [
+              {
+                "value": "none",
+                "title": "No preference"
+              },
+              {
+                "value": "vegetarian",
+                "title": "Vegetarian"
+              },
+              {
+                "value": "vegan",
+                "title": "Vegan"
+              },
+              {
+                "value": "other",
+                "title": "Other"
+              }
+            ],
+            "defaultValue": "other"
+          },
+          {
+            "type": "field",
+            "id": "allergies",
+            "fieldType": "multiSelect",
+            "label": "Allergies",
+            "required": false,
+            "scope": "booking",
+            "options": [
+              {
+                "value": "nuts",
+                "title": "Nuts"
+              },
+              {
+                "value": "gluten",
+                "title": "Gluten"
+              },
+              {
+                "value": "dairy",
+                "title": "Dairy"
+              },
+              {
+                "value": "shellfish",
+                "title": "Shellfish"
+              }
+            ],
+            "defaultValue": [
+              "nuts"
+            ]
+          },
+          {
+            "type": "field",
+            "id": "dietary_notes",
+            "fieldType": "multiline",
+            "label": "Tell us more about your diet",
+            "required": false,
+            "scope": "booking",
+            "validation": {
+              "maxLength": 500,
+              "message": "Use at most 500 characters."
+            },
+            "visibleWhen": {
+              "any": [
+                {
+                  "field": "diet_pref",
+                  "op": "in",
+                  "values": [
+                    "other"
+                  ]
+                },
+                {
+                  "field": "allergies",
+                  "op": "exists"
+                }
+              ]
+            },
+            "degradesTo": "text",
+            "defaultValue": "No tree nuts; peanuts are fine."
+          },
+          {
+            "type": "section",
+            "id": "traveler1",
+            "title": "Traveler 1 (adult)",
+            "blocks": [
+              {
+                "type": "field",
+                "id": "t1.name",
+                "fieldType": "text",
+                "label": "Full name",
+                "required": true,
+                "scope": "traveler",
+                "travelerIndex": 0,
+                "defaultValue": "Ada Lovelace"
+              },
+              {
+                "type": "field",
+                "id": "t1.birthDate",
+                "fieldType": "date",
+                "label": "Date of birth",
+                "required": true,
+                "scope": "traveler",
+                "travelerIndex": 0,
+                "defaultValue": "1988-04-12"
+              },
+              {
+                "type": "field",
+                "id": "t1.age",
+                "fieldType": "number",
+                "control": "stepper",
+                "label": "Age on the day",
+                "required": true,
+                "scope": "traveler",
+                "travelerIndex": 0,
+                "validation": {
+                  "min": 18,
+                  "max": 120,
+                  "step": 1,
+                  "message": "Adults must be 18 or older."
+                },
+                "defaultValue": 38
+              },
+              {
+                "type": "field",
+                "id": "t1.nationality",
+                "fieldType": "country",
+                "label": "Nationality",
+                "required": true,
+                "scope": "traveler",
+                "travelerIndex": 0,
+                "defaultValue": "GB"
+              },
+              {
+                "type": "field",
+                "id": "t1.passport",
+                "fieldType": "text",
+                "label": "Passport number",
+                "required": false,
+                "scope": "traveler",
+                "travelerIndex": 0,
+                "validation": {
+                  "minLength": 6,
+                  "maxLength": 12,
+                  "pattern": "^[A-Z0-9]+$",
+                  "message": "Use 6 to 12 capital letters or digits."
+                },
+                "autofill": "passport",
+                "requiredWhen": {
+                  "any": [
+                    {
+                      "field": "t1.nationality",
+                      "op": "notIn",
+                      "values": [
+                        "ES",
+                        "FR",
+                        "DE",
+                        "IT",
+                        "PT",
+                        "NL"
+                      ]
+                    }
+                  ]
+                },
+                "defaultValue": "K1234567"
+              },
+              {
+                "type": "field",
+                "id": "t1.weight",
+                "fieldType": "numberWithUnit",
+                "label": "Weight",
+                "hint": "Needed for the tender boat.",
+                "required": false,
+                "scope": "traveler",
+                "travelerIndex": 0,
+                "units": [
+                  {
+                    "value": "kg",
+                    "title": "kg"
+                  },
+                  {
+                    "value": "lb",
+                    "title": "lb"
+                  }
+                ],
+                "validation": {
+                  "min": 20,
+                  "max": 200
+                },
+                "requiredWhen": {
+                  "any": [
+                    {
+                      "field": "t1.age",
+                      "op": "lt",
+                      "values": [
+                        16
+                      ]
+                    },
+                    {
+                      "field": "t1.age",
+                      "op": "gt",
+                      "values": [
+                        65
+                      ]
+                    }
+                  ]
+                },
+                "degradesTo": "number",
+                "defaultValue": {
+                  "value": 72,
+                  "unit": "kg"
+                }
+              }
+            ]
+          },
+          {
+            "type": "section",
+            "id": "traveler2",
+            "title": "Traveler 2 (adult)",
+            "blocks": [
+              {
+                "type": "field",
+                "id": "t2.name",
+                "fieldType": "text",
+                "label": "Full name",
+                "required": true,
+                "scope": "traveler",
+                "travelerIndex": 1,
+                "defaultValue": "Charles Babbage"
+              },
+              {
+                "type": "field",
+                "id": "t2.age",
+                "fieldType": "number",
+                "label": "Age on the day",
+                "required": true,
+                "scope": "traveler",
+                "travelerIndex": 1,
+                "validation": {
+                  "min": 18,
+                  "max": 120,
+                  "step": 1
+                },
+                "defaultValue": 41
+              }
+            ]
+          },
+          {
+            "type": "section",
+            "id": "traveler3",
+            "title": "Traveler 3 (child)",
+            "blocks": [
+              {
+                "type": "field",
+                "id": "t3.name",
+                "fieldType": "text",
+                "label": "Full name",
+                "required": true,
+                "scope": "traveler",
+                "travelerIndex": 2,
+                "defaultValue": "Byron Lovelace"
+              },
+              {
+                "type": "field",
+                "id": "t3.age",
+                "fieldType": "number",
+                "label": "Age on the day",
+                "required": true,
+                "scope": "traveler",
+                "travelerIndex": 2,
+                "validation": {
+                  "min": 4,
+                  "max": 17,
+                  "step": 1
+                },
+                "defaultValue": 9
+              },
+              {
+                "type": "field",
+                "id": "t3.guardian",
+                "fieldType": "text",
+                "label": "Accompanying adult",
+                "required": true,
+                "scope": "traveler",
+                "travelerIndex": 2,
+                "visibleWhen": {
+                  "all": [
+                    {
+                      "field": "t3.age",
+                      "op": "lt",
+                      "values": [
+                        18
+                      ]
+                    },
+                    {
+                      "field": "t3.age",
+                      "op": "gt",
+                      "values": [
+                        0
+                      ]
+                    }
+                  ]
+                },
+                "defaultValue": "Ada Lovelace"
+              }
+            ]
+          }
+        ],
+        "primaryAction": {
+          "title": "Continue"
+        }
+      },
+      "nextAction": null,
+      "allowedActions": [
+        "submit",
+        "back",
+        "extend",
+        "cancel"
+      ],
+      "booking": {
+        "uuid": "9d1f3b5c-7e2a-4c6d-8f0b-1a3c5e7f9b2d",
+        "status": "on_hold"
+      },
+      "result": null,
+      "fallback": {
+        "webUrl": "https://book.tripian.com/c/chk_01SYNA0001",
+        "text": "Continue your booking on the web."
+      }
+    }
+  }
+}

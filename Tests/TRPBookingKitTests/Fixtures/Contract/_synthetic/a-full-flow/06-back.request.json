@@ -1,0 +1,16 @@
+{
+  "method": "POST",
+  "path": "/tour-api/checkouts/chk_01SYNA0001/back",
+  "headers": {
+    "x-api-key": "tripian-test-api-key",
+    "Authorization": "Bearer eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0LXVzZXIifQ.c2lnbmF0dXJl",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "Tripian-Booking-Version": "2026-10-01",
+    "Idempotency-Key": "c4da10b0-2a93-48fa-83bb-78171400993c"
+  },
+  "body": {
+    "fromStepId": "review",
+    "lang": "en"
+  }
+}

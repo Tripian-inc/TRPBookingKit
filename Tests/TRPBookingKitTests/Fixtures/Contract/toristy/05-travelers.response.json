@@ -1,0 +1,129 @@
+{
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 200,
+    "success": true,
+    "message": null,
+    "UUID": "58f1ab52-0bfd-4ab5-a6e5-4c08b64b7539",
+    "data": {
+      "id": "chk_01J9ZT7P2N",
+      "status": "collecting_details",
+      "provider": "toristy",
+      "product": {
+        "id": "TOR-PMI-CATHEDRAL",
+        "optionId": "RATE_STD",
+        "title": "Palma Cathedral and Old Town walking tour",
+        "imageUrl": "https://cdn.tripian.com/p/TOR-PMI-CATHEDRAL.jpg"
+      },
+      "amount": {
+        "amount": "62.50",
+        "currency": "EUR"
+      },
+      "holdExpiresAt": null,
+      "priceValidUntil": null,
+      "currentStep": {
+        "id": "details",
+        "title": "Contact and traveler details",
+        "subtitle": null,
+        "progress": {
+          "index": 5,
+          "count": null
+        },
+        "blocks": [
+          {
+            "type": "field",
+            "id": "lead.firstName",
+            "fieldType": "text",
+            "label": "First name",
+            "required": true,
+            "scope": "booking",
+            "autofill": "givenName"
+          },
+          {
+            "type": "field",
+            "id": "lead.lastName",
+            "fieldType": "text",
+            "label": "Last name",
+            "required": true,
+            "scope": "booking",
+            "autofill": "familyName"
+          },
+          {
+            "type": "field",
+            "id": "lead.email",
+            "fieldType": "email",
+            "label": "Email",
+            "required": true,
+            "scope": "booking",
+            "autofill": "email"
+          },
+          {
+            "type": "field",
+            "id": "lead.phone",
+            "fieldType": "phone",
+            "label": "Phone",
+            "required": true,
+            "scope": "booking",
+            "autofill": "tel"
+          },
+          {
+            "type": "field",
+            "id": "t1.fullName",
+            "fieldType": "text",
+            "label": "Traveler 1 full name",
+            "required": true,
+            "scope": "traveler",
+            "travelerIndex": 0
+          },
+          {
+            "type": "field",
+            "id": "t2.fullName",
+            "fieldType": "text",
+            "label": "Traveler 2 full name",
+            "required": true,
+            "scope": "traveler",
+            "travelerIndex": 1
+          },
+          {
+            "type": "field",
+            "id": "t3.fullName",
+            "fieldType": "text",
+            "label": "Traveler 3 full name",
+            "required": true,
+            "scope": "traveler",
+            "travelerIndex": 2
+          },
+          {
+            "type": "field",
+            "id": "t3.birthDate",
+            "fieldType": "date",
+            "label": "Traveler 3 date of birth",
+            "hint": "Children must be 6 or older.",
+            "required": true,
+            "scope": "traveler",
+            "travelerIndex": 2
+          }
+        ],
+        "primaryAction": {
+          "title": "Continue"
+        }
+      },
+      "nextAction": null,
+      "allowedActions": [
+        "submit",
+        "back",
+        "cancel"
+      ],
+      "booking": null,
+      "result": null,
+      "fallback": {
+        "webUrl": "https://book.tripian.com/c/chk_01J9ZT7P2N",
+        "text": "Continue your booking on the web."
+      }
+    }
+  }
+}

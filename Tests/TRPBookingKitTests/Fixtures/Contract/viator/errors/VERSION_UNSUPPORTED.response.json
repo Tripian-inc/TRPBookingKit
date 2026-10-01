@@ -1,0 +1,22 @@
+{
+  "status": 400,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 400,
+    "success": false,
+    "message": "This version of the booking contract is not supported.",
+    "UUID": "e6f5a4b3-2c1d-4e0f-9a87-6b5c4d3e2f10",
+    "data": {
+      "code": "VERSION_UNSUPPORTED",
+      "errors": [],
+      "retryable": false,
+      "checkout": null,
+      "supported": [
+        "2026-10-01"
+      ]
+    }
+  }
+}

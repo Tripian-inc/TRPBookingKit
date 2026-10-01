@@ -1,0 +1,132 @@
+{
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 200,
+    "success": true,
+    "message": null,
+    "UUID": "928bfbe5-7c8f-4f8d-a6ac-6fea4601bc8b",
+    "data": {
+      "id": "chk_01SYNA0001",
+      "status": "collecting_details",
+      "provider": "synthetic",
+      "product": {
+        "id": "SYN-HARBOUR-1",
+        "optionId": "PKG_TASTING",
+        "title": "Synthetic harbour cruise and tasting",
+        "imageUrl": "https://cdn.tripian.com/p/SYN-HARBOUR-1.jpg"
+      },
+      "amount": {
+        "amount": "200.00",
+        "currency": "EUR"
+      },
+      "holdExpiresAt": "2026-10-02T10:35:00Z",
+      "priceValidUntil": "2026-10-02T10:50:00Z",
+      "currentStep": {
+        "id": "review",
+        "title": "Review and confirm",
+        "subtitle": null,
+        "progress": {
+          "index": 5,
+          "count": 5
+        },
+        "blocks": [
+          {
+            "type": "summary",
+            "id": "summary",
+            "lines": [
+              {
+                "title": "2 × Adult",
+                "detail": "Cruise and tasting",
+                "amount": {
+                  "amount": "130.00",
+                  "currency": "EUR"
+                }
+              },
+              {
+                "title": "1 × Child",
+                "detail": "Cruise and tasting",
+                "amount": {
+                  "amount": "40.00",
+                  "currency": "EUR"
+                }
+              },
+              {
+                "title": "Photo package",
+                "amount": {
+                  "amount": "15.00",
+                  "currency": "EUR"
+                }
+              },
+              {
+                "title": "Hotel pickup",
+                "detail": "Hotel Arts Barcelona, 08:45",
+                "amount": {
+                  "amount": "15.00",
+                  "currency": "EUR"
+                }
+              }
+            ],
+            "total": {
+              "amount": "200.00",
+              "currency": "EUR"
+            },
+            "note": "15 October 2026, 11:00"
+          },
+          {
+            "type": "notice",
+            "id": "hold",
+            "tone": "warning",
+            "text": "Your places are held until 10:35 UTC.",
+            "onUnsupported": "skip"
+          },
+          {
+            "type": "consent",
+            "id": "terms",
+            "text": "I accept the terms of sale.",
+            "links": [
+              {
+                "title": "Terms",
+                "url": "https://www.tripian.com/terms"
+              },
+              {
+                "title": "Privacy",
+                "url": "https://www.tripian.com/privacy"
+              }
+            ],
+            "required": true
+          },
+          {
+            "type": "consent",
+            "id": "photos",
+            "text": "Photos of me may be used in marketing.",
+            "links": [],
+            "required": false
+          }
+        ],
+        "primaryAction": {
+          "title": "Continue to payment"
+        }
+      },
+      "nextAction": null,
+      "allowedActions": [
+        "submit",
+        "back",
+        "extend",
+        "cancel"
+      ],
+      "booking": {
+        "uuid": "9d1f3b5c-7e2a-4c6d-8f0b-1a3c5e7f9b2d",
+        "status": "on_hold"
+      },
+      "result": null,
+      "fallback": {
+        "webUrl": "https://book.tripian.com/c/chk_01SYNA0001",
+        "text": "Continue your booking on the web."
+      }
+    }
+  }
+}

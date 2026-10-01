@@ -1,0 +1,67 @@
+{
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 200,
+    "success": true,
+    "message": null,
+    "UUID": "a1f0c3e2-6b7d-4c8e-9f10-2b3c4d5e6f70",
+    "data": {
+      "id": "chk_01J9ZQ4M8K",
+      "status": "collecting_details",
+      "provider": "viator",
+      "product": {
+        "id": "5010BCN_SAGRADA",
+        "optionId": null,
+        "title": "Sagrada Família guided tour",
+        "imageUrl": "https://cdn.tripian.com/p/5010BCN_SAGRADA.jpg"
+      },
+      "amount": null,
+      "holdExpiresAt": null,
+      "priceValidUntil": null,
+      "currentStep": {
+        "id": "date",
+        "title": "Choose a date",
+        "subtitle": null,
+        "progress": {
+          "index": 1,
+          "count": null
+        },
+        "blocks": [
+          {
+            "type": "date",
+            "id": "date",
+            "mode": "available",
+            "range": {
+              "from": "2026-10-15",
+              "to": "2027-01-12"
+            },
+            "dates": [
+              "2026-10-15",
+              "2026-10-16",
+              "2026-10-18"
+            ],
+            "onUnsupported": "fallback"
+          }
+        ],
+        "primaryAction": {
+          "title": "Continue"
+        }
+      },
+      "nextAction": null,
+      "allowedActions": [
+        "submit",
+        "cancel"
+      ],
+      "booking": null,
+      "result": null,
+      "fallback": {
+        "webUrl": "https://book.tripian.com/c/chk_01J9ZQ4M8K",
+        "text": "Continue your booking on the web."
+      }
+    }
+  }
+}

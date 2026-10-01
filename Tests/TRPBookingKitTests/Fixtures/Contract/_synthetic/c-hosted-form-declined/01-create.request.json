@@ -1,0 +1,21 @@
+{
+  "method": "POST",
+  "path": "/tour-api/checkouts",
+  "headers": {
+    "x-api-key": "tripian-test-api-key",
+    "Authorization": "Bearer eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0LXVzZXIifQ.c2lnbmF0dXJl",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "Tripian-Booking-Version": "2026-10-01",
+    "Idempotency-Key": "10572f46-dcee-4a56-bdef-5764c29adc0c",
+    "Tripian-Client-Capabilities": "blocks=date,choice,quantity,field,consent,summary,notice,image,section; fields=text,multiline,email,phone,number,numberWithUnit,date,time,select,multiSelect,country,boolean,locationOrText; actions=stripe_payment_intent,provider_hosted_form,braintree_dropin,redirect,three_ds"
+  },
+  "body": {
+    "productId": "SYN-C-HOSTED-FORM-DECLINED",
+    "optionId": null,
+    "date": "2026-10-15",
+    "currency": "EUR",
+    "bookingUuid": "6e8a0c2e-4f1b-4d3a-8b5c-9d1e3f5a7b9c",
+    "lang": "en"
+  }
+}

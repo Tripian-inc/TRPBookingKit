@@ -1,0 +1,88 @@
+{
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 200,
+    "success": true,
+    "message": null,
+    "UUID": "e87d2649-d4da-43a6-bc38-28503e4440b2",
+    "data": {
+      "id": "chk_01SYNF0001",
+      "status": "collecting_details",
+      "provider": "synthetic",
+      "product": {
+        "id": "SYN-F-HOLD-EXPIRED",
+        "optionId": null,
+        "title": "Synthetic walking tour",
+        "imageUrl": null
+      },
+      "amount": {
+        "amount": "50.00",
+        "currency": "EUR"
+      },
+      "holdExpiresAt": "2026-10-02T13:15:00Z",
+      "priceValidUntil": "2026-10-02T13:15:00Z",
+      "currentStep": {
+        "id": "review",
+        "title": "Review",
+        "subtitle": null,
+        "progress": {
+          "index": 2,
+          "count": 2
+        },
+        "blocks": [
+          {
+            "type": "summary",
+            "id": "summary",
+            "lines": [
+              {
+                "title": "2 × Adult",
+                "amount": {
+                  "amount": "50.00",
+                  "currency": "EUR"
+                }
+              }
+            ],
+            "total": {
+              "amount": "50.00",
+              "currency": "EUR"
+            }
+          },
+          {
+            "type": "consent",
+            "id": "terms",
+            "text": "I accept the terms of sale.",
+            "links": [
+              {
+                "title": "Terms",
+                "url": "https://www.tripian.com/terms"
+              }
+            ],
+            "required": true
+          }
+        ],
+        "primaryAction": {
+          "title": "Continue to payment"
+        }
+      },
+      "nextAction": null,
+      "allowedActions": [
+        "submit",
+        "back",
+        "cancel"
+      ],
+      "booking": {
+        "uuid": "4f6a8c0e-2b3d-4e5f-a7b9-c1d3e5f7a9b1",
+        "status": "on_hold"
+      },
+      "result": null,
+      "fallback": {
+        "webUrl": "https://book.tripian.com/c/chk_01SYNF0001",
+        "text": "Continue your booking on the web."
+      }
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "status": 409,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 409,
+    "success": false,
+    "message": "This booking cannot be cancelled in the app. Please contact support.",
+    "UUID": "9d72bcab-0058-498f-ae73-344dd91e9833",
+    "data": {
+      "code": "NOT_CANCELLABLE",
+      "errors": [],
+      "retryable": false,
+      "checkout": null
+    }
+  }
+}

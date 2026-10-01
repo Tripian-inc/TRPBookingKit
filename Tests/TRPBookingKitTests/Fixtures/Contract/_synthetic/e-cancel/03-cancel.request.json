@@ -1,0 +1,15 @@
+{
+  "method": "POST",
+  "path": "/tour-api/checkouts/chk_01SYNE0001/cancel",
+  "headers": {
+    "x-api-key": "tripian-test-api-key",
+    "Authorization": "Bearer eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0LXVzZXIifQ.c2lnbmF0dXJl",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "Tripian-Booking-Version": "2026-10-01",
+    "Idempotency-Key": "ceb2108e-0711-4255-948a-dc1db4c6de07"
+  },
+  "body": {
+    "lang": "en"
+  }
+}

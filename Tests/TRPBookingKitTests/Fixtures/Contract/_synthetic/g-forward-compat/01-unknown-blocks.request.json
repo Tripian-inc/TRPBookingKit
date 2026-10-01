@@ -1,0 +1,12 @@
+{
+  "method": "GET",
+  "path": "/tour-api/checkouts/chk_01SYNG0001?lang=en",
+  "headers": {
+    "x-api-key": "tripian-test-api-key",
+    "Authorization": "Bearer eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0LXVzZXIifQ.c2lnbmF0dXJl",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": null
+}

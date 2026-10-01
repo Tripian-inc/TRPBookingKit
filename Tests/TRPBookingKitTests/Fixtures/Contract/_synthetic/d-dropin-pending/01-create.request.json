@@ -1,0 +1,21 @@
+{
+  "method": "POST",
+  "path": "/tour-api/checkouts",
+  "headers": {
+    "x-api-key": "tripian-test-api-key",
+    "Authorization": "Bearer eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0LXVzZXIifQ.c2lnbmF0dXJl",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "Tripian-Booking-Version": "2026-10-01",
+    "Idempotency-Key": "d563433c-7ef7-45a8-8461-afa4cb7794ef",
+    "Tripian-Client-Capabilities": "blocks=date,choice,quantity,field,consent,summary,notice,image,section; fields=text,multiline,email,phone,number,numberWithUnit,date,time,select,multiSelect,country,boolean,locationOrText; actions=stripe_payment_intent,provider_hosted_form,braintree_dropin,redirect,three_ds"
+  },
+  "body": {
+    "productId": "SYN-D-DROPIN-PENDING",
+    "optionId": null,
+    "date": "2026-10-15",
+    "currency": "USD",
+    "bookingUuid": "1b3d5f7a-9c2e-4a4b-8d6e-0f2a4b6c8d0e",
+    "lang": "en"
+  }
+}

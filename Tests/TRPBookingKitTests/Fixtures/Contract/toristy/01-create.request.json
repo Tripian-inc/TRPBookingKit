@@ -1,0 +1,21 @@
+{
+  "method": "POST",
+  "path": "/tour-api/checkouts",
+  "headers": {
+    "x-api-key": "tripian-test-api-key",
+    "Authorization": "Bearer eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0LXVzZXIifQ.c2lnbmF0dXJl",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "Tripian-Booking-Version": "2026-10-01",
+    "Idempotency-Key": "7db7c8c2-3d43-42c7-85d6-8ab197a92b4c",
+    "Tripian-Client-Capabilities": "blocks=date,choice,quantity,field,consent,summary,notice; fields=text,email,phone,date,select,country,boolean,locationOrText; actions=stripe_payment_intent,provider_hosted_form,braintree_dropin"
+  },
+  "body": {
+    "productId": "TOR-PMI-CATHEDRAL",
+    "optionId": null,
+    "date": null,
+    "currency": "EUR",
+    "bookingUuid": "8b2e4c6a-1d3f-4a5b-9c7d-0e1f2a3b4c5d",
+    "lang": "en"
+  }
+}

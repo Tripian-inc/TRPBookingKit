@@ -1,0 +1,66 @@
+{
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 200,
+    "success": true,
+    "message": null,
+    "UUID": "09a7faa2-f5e5-420d-a292-e5d91549d9d9",
+    "data": {
+      "uuid": "8b2e4c6a-1d3f-4a5b-9c7d-0e1f2a3b4c5d",
+      "status": "confirmed",
+      "provider": "toristy",
+      "providerReference": "TRS-20261015-48213",
+      "product": {
+        "id": "TOR-PMI-CATHEDRAL",
+        "optionId": "RATE_STD",
+        "title": "Palma Cathedral and Old Town walking tour",
+        "imageUrl": "https://cdn.tripian.com/p/TOR-PMI-CATHEDRAL.jpg"
+      },
+      "units": {
+        "ADULT": 2,
+        "CHILD": 1
+      },
+      "start": {
+        "date": "2026-10-15",
+        "time": "10:00",
+        "timezone": "Europe/Madrid"
+      },
+      "durationMinutes": 120,
+      "meetingPoint": {
+        "name": "Plaça de la Seu, cathedral main door",
+        "address": "Plaça de la Seu s/n, 07001 Palma",
+        "lat": 39.5676,
+        "lng": 2.6484
+      },
+      "amount": {
+        "amount": "62.50",
+        "currency": "EUR"
+      },
+      "utcExpiresAt": null,
+      "vouchers": [
+        {
+          "format": "qr",
+          "url": "https://cdn.tripian.com/v/8b2e4c6a-qr.png"
+        }
+      ],
+      "cancellation": {
+        "allowed": true,
+        "deadline": "2026-10-14T08:00:00Z",
+        "refund": "full",
+        "refundAmount": {
+          "amount": "62.50",
+          "currency": "EUR"
+        }
+      },
+      "refund": null,
+      "contact": {
+        "name": "Elif Demir",
+        "email": "elif@example.com"
+      }
+    }
+  }
+}

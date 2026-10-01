@@ -1,0 +1,46 @@
+{
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 200,
+    "success": true,
+    "message": null,
+    "UUID": "2bffeb10-5fa6-443d-b6f6-c60b5b011986",
+    "data": {
+      "id": "chk_01SYNB0001",
+      "status": "confirmed",
+      "provider": "synthetic",
+      "product": {
+        "id": "SYN-B-STRIPE-RETRY",
+        "optionId": null,
+        "title": "Synthetic tea ceremony",
+        "imageUrl": null
+      },
+      "amount": {
+        "amount": "9600",
+        "currency": "JPY"
+      },
+      "holdExpiresAt": null,
+      "priceValidUntil": null,
+      "currentStep": null,
+      "nextAction": null,
+      "allowedActions": [],
+      "booking": {
+        "uuid": "2a4c6e8f-0b1d-4e3f-9a5b-7c9d1e3f5a7b",
+        "status": "confirmed"
+      },
+      "result": {
+        "title": "Your booking is confirmed",
+        "message": "Your tickets have also been sent to your email address.",
+        "bookingUuid": "2a4c6e8f-0b1d-4e3f-9a5b-7c9d1e3f5a7b"
+      },
+      "fallback": {
+        "webUrl": "https://book.tripian.com/c/chk_01SYNB0001",
+        "text": "Continue your booking on the web."
+      }
+    }
+  }
+}

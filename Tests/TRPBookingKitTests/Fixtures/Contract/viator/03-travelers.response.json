@@ -1,0 +1,101 @@
+{
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 200,
+    "success": true,
+    "message": null,
+    "UUID": "17faed2a-e91d-4cc0-9a70-546bb34b5679",
+    "data": {
+      "id": "chk_01J9ZQ4M8K",
+      "status": "collecting_details",
+      "provider": "viator",
+      "product": {
+        "id": "5010BCN_SAGRADA",
+        "optionId": null,
+        "title": "Sagrada Família guided tour",
+        "imageUrl": "https://cdn.tripian.com/p/5010BCN_SAGRADA.jpg"
+      },
+      "amount": {
+        "amount": "145.00",
+        "currency": "EUR"
+      },
+      "holdExpiresAt": null,
+      "priceValidUntil": null,
+      "currentStep": {
+        "id": "option",
+        "title": "Choose a tour and time",
+        "subtitle": "15 October 2026 · 2 adults, 1 child",
+        "progress": {
+          "index": 3,
+          "count": null
+        },
+        "blocks": [
+          {
+            "type": "choice",
+            "id": "option",
+            "multiple": false,
+            "options": [
+              {
+                "value": "TG1~10:30",
+                "title": "Guided tour in English",
+                "subtitle": "10:30 · 90 min",
+                "price": {
+                  "amount": "145.00",
+                  "currency": "EUR"
+                }
+              },
+              {
+                "value": "TG1~14:00",
+                "title": "Guided tour in English",
+                "subtitle": "14:00 · 90 min",
+                "price": {
+                  "amount": "145.00",
+                  "currency": "EUR"
+                }
+              },
+              {
+                "value": "TG2~11:00",
+                "title": "Guided tour with tower access",
+                "subtitle": "11:00 · 120 min",
+                "price": {
+                  "amount": "190.00",
+                  "currency": "EUR"
+                },
+                "badge": "Popular"
+              },
+              {
+                "value": "TG2~16:00",
+                "title": "Guided tour with tower access",
+                "subtitle": "16:00 · sold out",
+                "price": {
+                  "amount": "190.00",
+                  "currency": "EUR"
+                },
+                "disabled": true
+              }
+            ]
+          }
+        ],
+        "primaryAction": {
+          "title": "Continue"
+        }
+      },
+      "nextAction": null,
+      "allowedActions": [
+        "submit",
+        "back",
+        "cancel"
+      ],
+      "booking": null,
+      "result": null,
+      "fallback": {
+        "webUrl": "https://book.tripian.com/c/chk_01J9ZQ4M8K",
+        "text": "Continue your booking on the web."
+      }
+    }
+  }
+}

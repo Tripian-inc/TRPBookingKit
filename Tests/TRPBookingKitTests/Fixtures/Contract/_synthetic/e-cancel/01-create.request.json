@@ -1,0 +1,21 @@
+{
+  "method": "POST",
+  "path": "/tour-api/checkouts",
+  "headers": {
+    "x-api-key": "tripian-test-api-key",
+    "Authorization": "Bearer eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0LXVzZXIifQ.c2lnbmF0dXJl",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "Tripian-Booking-Version": "2026-10-01",
+    "Idempotency-Key": "6d1b4e88-d5a3-4850-8105-1dff3648f684",
+    "Tripian-Client-Capabilities": "blocks=date,choice,quantity,field,consent,summary,notice,image,section; fields=text,multiline,email,phone,number,numberWithUnit,date,time,select,multiSelect,country,boolean,locationOrText; actions=stripe_payment_intent,provider_hosted_form,braintree_dropin,redirect,three_ds"
+  },
+  "body": {
+    "productId": "SYN-E-CANCEL",
+    "optionId": null,
+    "date": "2026-10-15",
+    "currency": "EUR",
+    "bookingUuid": "7c9e1a3b-5d6f-4b8a-9c0d-2e4f6a8b0c1d",
+    "lang": "en"
+  }
+}

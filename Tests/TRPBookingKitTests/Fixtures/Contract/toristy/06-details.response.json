@@ -1,0 +1,91 @@
+{
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 200,
+    "success": true,
+    "message": null,
+    "UUID": "c7f5a7c9-a39e-407e-8ec2-d7cc56858053",
+    "data": {
+      "id": "chk_01J9ZT7P2N",
+      "status": "collecting_details",
+      "provider": "toristy",
+      "product": {
+        "id": "TOR-PMI-CATHEDRAL",
+        "optionId": "RATE_STD",
+        "title": "Palma Cathedral and Old Town walking tour",
+        "imageUrl": "https://cdn.tripian.com/p/TOR-PMI-CATHEDRAL.jpg"
+      },
+      "amount": {
+        "amount": "62.50",
+        "currency": "EUR"
+      },
+      "holdExpiresAt": "2026-10-02T09:42:00Z",
+      "priceValidUntil": "2026-10-02T09:42:00Z",
+      "currentStep": {
+        "id": "summary",
+        "title": "Summary",
+        "subtitle": null,
+        "progress": {
+          "index": 6,
+          "count": 6
+        },
+        "blocks": [
+          {
+            "type": "summary",
+            "id": "summary",
+            "lines": [
+              {
+                "title": "2 × Adult",
+                "amount": {
+                  "amount": "50.00",
+                  "currency": "EUR"
+                }
+              },
+              {
+                "title": "1 × Child",
+                "amount": {
+                  "amount": "12.50",
+                  "currency": "EUR"
+                }
+              }
+            ],
+            "total": {
+              "amount": "62.50",
+              "currency": "EUR"
+            },
+            "note": "15 October 2026, 10:00 · Standard group"
+          },
+          {
+            "type": "notice",
+            "id": "cancellation",
+            "tone": "info",
+            "text": "Free cancellation until 14 October, 10:00.",
+            "onUnsupported": "skip"
+          }
+        ],
+        "primaryAction": {
+          "title": "Continue to payment"
+        }
+      },
+      "nextAction": null,
+      "allowedActions": [
+        "submit",
+        "back",
+        "cancel"
+      ],
+      "booking": {
+        "uuid": "8b2e4c6a-1d3f-4a5b-9c7d-0e1f2a3b4c5d",
+        "status": "on_hold"
+      },
+      "result": null,
+      "fallback": {
+        "webUrl": "https://book.tripian.com/c/chk_01J9ZT7P2N",
+        "text": "Continue your booking on the web."
+      }
+    }
+  }
+}

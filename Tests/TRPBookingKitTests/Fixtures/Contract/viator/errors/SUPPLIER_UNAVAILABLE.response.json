@@ -1,0 +1,19 @@
+{
+  "status": 503,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 503,
+    "success": false,
+    "message": "The provider cannot be reached right now. Please try again shortly.",
+    "UUID": "b3d2c1e0-8f9a-4b0c-9dcb-4f5a6b7c8d92",
+    "data": {
+      "code": "SUPPLIER_UNAVAILABLE",
+      "errors": [],
+      "retryable": true,
+      "checkout": null
+    }
+  }
+}

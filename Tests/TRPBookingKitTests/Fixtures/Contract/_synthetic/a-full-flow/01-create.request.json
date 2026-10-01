@@ -1,0 +1,21 @@
+{
+  "method": "POST",
+  "path": "/tour-api/checkouts",
+  "headers": {
+    "x-api-key": "tripian-test-api-key",
+    "Authorization": "Bearer eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0LXVzZXIifQ.c2lnbmF0dXJl",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "Tripian-Booking-Version": "2026-10-01",
+    "Idempotency-Key": "7ebad2a7-7475-4332-9621-8f1fc8327e6e",
+    "Tripian-Client-Capabilities": "blocks=date,choice,quantity,field,consent,summary,notice,image,section; fields=text,multiline,email,phone,number,numberWithUnit,date,time,select,multiSelect,country,boolean,locationOrText; actions=stripe_payment_intent,provider_hosted_form,braintree_dropin,redirect,three_ds"
+  },
+  "body": {
+    "productId": "SYN-HARBOUR-1",
+    "optionId": null,
+    "date": null,
+    "currency": "EUR",
+    "bookingUuid": "9d1f3b5c-7e2a-4c6d-8f0b-1a3c5e7f9b2d",
+    "lang": "en"
+  }
+}

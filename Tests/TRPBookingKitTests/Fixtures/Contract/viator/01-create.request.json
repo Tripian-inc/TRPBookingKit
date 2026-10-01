@@ -1,0 +1,21 @@
+{
+  "method": "POST",
+  "path": "/tour-api/checkouts",
+  "headers": {
+    "x-api-key": "tripian-test-api-key",
+    "Authorization": "Bearer eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0LXVzZXIifQ.c2lnbmF0dXJl",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "Tripian-Booking-Version": "2026-10-01",
+    "Idempotency-Key": "0c4e2f7a-1b3d-4e5f-8a9b-2c6d7e8f9a01",
+    "Tripian-Client-Capabilities": "blocks=date,choice,quantity,field,consent,summary,notice; fields=text,email,phone,date,select,country,boolean,locationOrText; actions=stripe_payment_intent,provider_hosted_form,braintree_dropin"
+  },
+  "body": {
+    "productId": "5010BCN_SAGRADA",
+    "optionId": null,
+    "date": null,
+    "currency": "EUR",
+    "bookingUuid": "3f6c1a9e-8d2b-4b7a-a1c4-5e9f0d2b7c11",
+    "lang": "en"
+  }
+}

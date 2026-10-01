@@ -1,0 +1,84 @@
+{
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 200,
+    "success": true,
+    "message": null,
+    "UUID": "3865b293-9fe6-4e3c-a00f-748dea7944a5",
+    "data": [
+      {
+        "uuid": "9d1f3b5c-7e2a-4c6d-8f0b-1a3c5e7f9b2d",
+        "status": "confirmed",
+        "provider": "synthetic",
+        "providerReference": "SYN-000123",
+        "product": {
+          "id": "SYN-HARBOUR-1",
+          "optionId": "PKG_TASTING",
+          "title": "Synthetic harbour cruise and tasting",
+          "imageUrl": "https://cdn.tripian.com/p/SYN-HARBOUR-1.jpg"
+        },
+        "units": {
+          "ADULT": 2,
+          "CHILD": 1,
+          "CABIN": 0
+        },
+        "start": {
+          "date": "2026-10-15",
+          "time": "11:00",
+          "timezone": "Europe/Madrid"
+        },
+        "durationMinutes": 180,
+        "meetingPoint": {
+          "name": "Moll de la Fusta, pier 3",
+          "address": "Moll de la Fusta, 08039 Barcelona",
+          "lat": 41.3775,
+          "lng": 2.1802
+        },
+        "amount": {
+          "amount": "200.00",
+          "currency": "EUR"
+        },
+        "utcExpiresAt": null,
+        "vouchers": [
+          {
+            "format": "barcode",
+            "url": "https://cdn.tripian.com/v/9d1f3b5c-barcode.png"
+          },
+          {
+            "format": "url",
+            "url": "https://tickets.synthetic.example/9d1f3b5c"
+          }
+        ],
+        "cancellation": {
+          "allowed": true,
+          "deadline": "2026-10-14T09:00:00Z",
+          "refund": "partial",
+          "refundAmount": {
+            "amount": "100.00",
+            "currency": "EUR"
+          }
+        },
+        "refund": null,
+        "contact": {
+          "name": "Ada Lovelace",
+          "email": "ada@example.com"
+        }
+      }
+    ],
+    "pagination": {
+      "count": 1,
+      "total": 1,
+      "perPage": 20,
+      "currentPage": 1,
+      "totalPages": 1,
+      "links": {
+        "next": null,
+        "previous": null
+      }
+    }
+  }
+}

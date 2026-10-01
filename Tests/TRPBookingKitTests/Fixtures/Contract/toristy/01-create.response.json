@@ -1,0 +1,68 @@
+{
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 200,
+    "success": true,
+    "message": null,
+    "UUID": "7bbc73ff-5377-4d2a-8af0-327d42aec048",
+    "data": {
+      "id": "chk_01J9ZT7P2N",
+      "status": "collecting_details",
+      "provider": "toristy",
+      "product": {
+        "id": "TOR-PMI-CATHEDRAL",
+        "optionId": null,
+        "title": "Palma Cathedral and Old Town walking tour",
+        "imageUrl": "https://cdn.tripian.com/p/TOR-PMI-CATHEDRAL.jpg"
+      },
+      "amount": null,
+      "holdExpiresAt": null,
+      "priceValidUntil": null,
+      "currentStep": {
+        "id": "date",
+        "title": "Choose a date",
+        "subtitle": null,
+        "progress": {
+          "index": 1,
+          "count": null
+        },
+        "blocks": [
+          {
+            "type": "date",
+            "id": "date",
+            "mode": "available",
+            "range": {
+              "from": "2026-10-15",
+              "to": "2027-01-12"
+            },
+            "dates": [
+              "2026-10-15",
+              "2026-10-17",
+              "2026-10-22",
+              "2026-10-24"
+            ],
+            "onUnsupported": "fallback"
+          }
+        ],
+        "primaryAction": {
+          "title": "Continue"
+        }
+      },
+      "nextAction": null,
+      "allowedActions": [
+        "submit",
+        "cancel"
+      ],
+      "booking": null,
+      "result": null,
+      "fallback": {
+        "webUrl": "https://book.tripian.com/c/chk_01J9ZT7P2N",
+        "text": "Continue your booking on the web."
+      }
+    }
+  }
+}

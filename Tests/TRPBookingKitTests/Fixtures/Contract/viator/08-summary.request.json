@@ -1,0 +1,22 @@
+{
+  "method": "POST",
+  "path": "/tour-api/checkouts/chk_01J9ZQ4M8K/steps/summary",
+  "headers": {
+    "x-api-key": "tripian-test-api-key",
+    "Authorization": "Bearer eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0LXVzZXIifQ.c2lnbmF0dXJl",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "Tripian-Booking-Version": "2026-10-01",
+    "Idempotency-Key": "6f2d4b8a-0c1e-4d3f-a7b9-8c9d0e1f2a35"
+  },
+  "body": {
+    "answers": {
+      "terms": true
+    },
+    "expectedAmount": {
+      "amount": "145.00",
+      "currency": "EUR"
+    },
+    "lang": "en"
+  }
+}

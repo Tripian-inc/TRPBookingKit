@@ -1,0 +1,19 @@
+{
+  "status": 409,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 409,
+    "success": false,
+    "message": "Your previous request is still being processed.",
+    "UUID": "151b2c98-fd75-4232-ab41-0b5e82aea8bf",
+    "data": {
+      "code": "IN_PROGRESS",
+      "errors": [],
+      "retryable": false,
+      "checkout": null
+    }
+  }
+}

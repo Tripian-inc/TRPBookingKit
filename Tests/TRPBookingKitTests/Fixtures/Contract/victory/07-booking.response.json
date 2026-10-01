@@ -1,0 +1,57 @@
+{
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Tripian-Booking-Version": "2026-10-01"
+  },
+  "body": {
+    "status": 200,
+    "success": true,
+    "message": null,
+    "UUID": "d482eaa2-a799-4136-b773-f37290cb2533",
+    "data": {
+      "uuid": "5c7e9a1b-3d4f-4b6a-8c2d-7e9f1a2b3c4d",
+      "status": "pending",
+      "provider": "victory",
+      "providerReference": "TE-ORD-5531902",
+      "product": {
+        "id": "TEVO-2817364",
+        "optionId": "TG_88122",
+        "title": "Hamilton on Broadway",
+        "imageUrl": "https://cdn.tripian.com/p/TEVO-2817364.jpg"
+      },
+      "units": {
+        "TICKET": 2
+      },
+      "start": {
+        "date": "2026-10-15",
+        "time": "19:00",
+        "timezone": "America/New_York"
+      },
+      "durationMinutes": 165,
+      "meetingPoint": {
+        "name": "Richard Rodgers Theatre",
+        "address": "226 W 46th St, New York, NY 10036",
+        "lat": 40.759,
+        "lng": -73.9866
+      },
+      "amount": {
+        "amount": "212.40",
+        "currency": "USD"
+      },
+      "utcExpiresAt": null,
+      "vouchers": [],
+      "cancellation": {
+        "allowed": false,
+        "deadline": null,
+        "refund": "none",
+        "refundAmount": null
+      },
+      "refund": null,
+      "contact": {
+        "name": "Maya Brooks",
+        "email": "maya@example.com"
+      }
+    }
+  }
+}
