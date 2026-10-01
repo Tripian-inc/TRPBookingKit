@@ -44,8 +44,13 @@ public struct ViatorCredentials: Sendable, Hashable {
 
     /// `scheme://host[:port]` of `paymentPageURL`, with no trailing slash.
     public var hostingOrigin: String {
-        guard let components = URLComponents(url: paymentPageURL, resolvingAgainstBaseURL: false),
-              let scheme = components.scheme, let host = components.host else { return paymentPageURL.absoluteString }
+        Self.origin(of: paymentPageURL)
+    }
+
+    /// `scheme://host[:port]` of `url`, with no trailing slash.
+    static func origin(of url: URL) -> String {
+        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
+              let scheme = components.scheme, let host = components.host else { return url.absoluteString }
         return components.port.map { "\(scheme)://\(host):\($0)" } ?? "\(scheme)://\(host)"
     }
 }

@@ -60,12 +60,18 @@ public final class ViatorPaymentWebSession: NSObject {
     private var sessionToken: String?
     private var continuation: CheckedContinuation<String, Error>?
 
-    public init(credentials: ViatorCredentials, languageCode: String) {
+    public convenience init(credentials: ViatorCredentials, languageCode: String) {
+        self.init(paymentPageURL: credentials.paymentPageURL, languageCode: languageCode)
+    }
+
+    /// A session for the payment page at `paymentPageURL`, for a host that keeps no Viator credentials because a
+    /// server holds the cart and only hands it a payment session token.
+    public init(paymentPageURL: URL, languageCode: String) {
         let configuration = WKWebViewConfiguration()
         configuration.websiteDataStore = .nonPersistent()
         webView = WKWebView(frame: .zero, configuration: configuration)
-        pageURL = credentials.paymentPageURL
-        allowedOrigin = credentials.hostingOrigin
+        pageURL = paymentPageURL
+        allowedOrigin = ViatorCredentials.origin(of: paymentPageURL)
         self.languageCode = languageCode
         super.init()
         configuration.userContentController.add(WeakMessageHandler(self), name: ViatorPaymentMessage.handlerName)
