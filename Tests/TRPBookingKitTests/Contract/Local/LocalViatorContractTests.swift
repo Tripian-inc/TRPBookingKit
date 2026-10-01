@@ -94,6 +94,29 @@ final class LocalViatorContractTests: XCTestCase {
         try await assertLocalSnapshot("viator/errors", "VERSION_UNSUPPORTED", checkout: checkout, bookings: bookings)
     }
 
+    func testPriceChanged() async throws {
+        try await replay(Self.flow[0..<7])
+        service.availabilityResult = .success(try decodeJSON(ViatorAvailability.self, Self.priceChangedAvailabilityJSON))
+        _ = try await checkout.back(checkoutId: "chk_01J9ZQ4M8K", fromStepId: "summary", lang: "en")
+        _ = try await checkout.back(checkoutId: "chk_01J9ZQ4M8K", fromStepId: "details", lang: "en")
+        _ = try await checkout.back(checkoutId: "chk_01J9ZQ4M8K", fromStepId: "option", lang: "en")
+        _ = try await checkout.submit(checkoutId: "chk_01J9ZQ4M8K", stepId: "travelers",
+                                      answers: ["units": ["ADULT": 2, "CHILD": 1]], lang: "en")
+        _ = try await checkout.submit(checkoutId: "chk_01J9ZQ4M8K", stepId: "option",
+                                      answers: ["option": "TG1~10:30"], lang: "en")
+        _ = try await checkout.submit(checkoutId: "chk_01J9ZQ4M8K", stepId: "details", answers: [
+            "lead.firstName": "Cem", "lead.lastName": "Yilmaz", "lead.email": "cem@example.com",
+            "lead.phone": "+905321234567", "pickup": ["text": "Cruise terminal, gate A"]
+        ], lang: "en")
+        try await assertLocalSnapshot("viator/errors", "PRICE_CHANGED", checkout: checkout, bookings: bookings)
+    }
+
+    func testCancelConfirmedBooking() async throws {
+        service.cancelResult = .success(try decodeJSON(ViatorCancellation.self, #"{"bookingId": "BR-1122334455", "status": "ACCEPTED"}"#))
+        try await replay(Self.flow[...])
+        try await assertLocalSnapshot(directory, "13-booking-cancel", checkout: checkout, bookings: bookings)
+    }
+
     private static let productJSON = #"""
     {"productCode": "5010BCN_SAGRADA", "title": "Sagrada Família guided tour", "timeZone": "Europe/Madrid", "bookingQuestions": ["PICKUP_POINT"],
      "pricingInfo": {"ageBands": [
@@ -126,6 +149,12 @@ final class LocalViatorContractTests: XCTestCase {
 
     private static let availabilityJSON = #"{"productCode": "5010BCN_SAGRADA", "currency": "EUR", "bookableItems": ["#
         + [availabilityItem("TG1", "10:30", available: true, adults: 110, total: 145),
+           availabilityItem("TG1", "14:00", available: true, adults: 110, total: 145),
+           availabilityItem("TG2", "11:00", available: true, adults: 140, total: 190),
+           availabilityItem("TG2", "16:00", available: false, adults: 140, total: 190)].joined(separator: ",") + "]}"
+
+    private static let priceChangedAvailabilityJSON = #"{"productCode": "5010BCN_SAGRADA", "currency": "EUR", "bookableItems": ["#
+        + [availabilityItem("TG1", "10:30", available: true, adults: 114, total: 152),
            availabilityItem("TG1", "14:00", available: true, adults: 110, total: 145),
            availabilityItem("TG2", "11:00", available: true, adults: 140, total: 190),
            availabilityItem("TG2", "16:00", available: false, adults: 140, total: 190)].joined(separator: ",") + "]}"
