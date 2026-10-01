@@ -50,6 +50,8 @@ public struct BookingRecord: Sendable, Hashable, Codable, Identifiable {
     public var providerStatus: String?
     public let createdAt: Date
     public var updatedAt: Date
+    /// The contract's view of the booking, kept by the local checkout; `nil` for records made outside it.
+    public var contractBooking: BookingContract.Booking?
 
     public init(reference: BookingReference,
                 activityId: String,
@@ -61,7 +63,8 @@ public struct BookingRecord: Sendable, Hashable, Codable, Identifiable {
                 deadline: BookingDeadline? = nil,
                 receipt: PaymentReceipt? = nil,
                 providerStatus: String? = nil,
-                createdAt: Date = Date()) {
+                createdAt: Date = Date(),
+                contractBooking: BookingContract.Booking? = nil) {
         self.reference = reference
         self.activityId = activityId
         self.title = title
@@ -74,6 +77,7 @@ public struct BookingRecord: Sendable, Hashable, Codable, Identifiable {
         self.providerStatus = providerStatus
         self.createdAt = createdAt
         self.updatedAt = createdAt
+        self.contractBooking = contractBooking
     }
 }
 
