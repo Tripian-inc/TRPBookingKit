@@ -14,6 +14,8 @@ final class MockViatorBookingService: ViatorBookingService, @unchecked Sendable 
     var cancelQuoteResult: Result<ViatorCancelQuote, Error>?
     var cancelResult: Result<ViatorCancellation, Error>?
 
+    var bookDelay: TimeInterval = 0
+
     var holdCallCount = 0
     var bookCallCount = 0
     var statusCallCount = 0
@@ -52,6 +54,7 @@ final class MockViatorBookingService: ViatorBookingService, @unchecked Sendable 
 
     func book(cartRef: String, bookingRef: String, details: ViatorBookerDetails, paymentToken: String) async throws -> ViatorBookResult {
         bookCallCount += 1
+        if bookDelay > 0 { try? await Task.sleep(nanoseconds: UInt64(bookDelay * 1_000_000_000)) }
         return try unwrap(bookResult)
     }
 

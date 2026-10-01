@@ -49,8 +49,11 @@ final class ViatorCheckoutFlow: ProviderCheckoutFlow {
         default: try submitSummary(submitted, expectedAmount: expectedAmount)
         }
         answers.record(submitted, for: stepId)
-        show(Self.steps[(Self.steps.firstIndex(of: stepId) ?? 0) + 1])
-        if stepId == "summary" { offerPayment(actionId: context.identifiers.next("act_")) }
+        if stepId == "summary" {
+            offerPayment(actionId: context.identifiers.next("act_"))
+        } else {
+            show(Self.steps[(Self.steps.firstIndex(of: stepId) ?? 0) + 1])
+        }
     }
 
     func back() async throws {
