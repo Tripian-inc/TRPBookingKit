@@ -2,12 +2,17 @@ import Foundation
 
 extension TRPBooking {
     /// A contract `CheckoutClient` that runs on the device over this instance's checkouts and store.
+    /// - Parameters:
+    ///   - stripe: creates the PaymentIntent for Toristy checkouts; without it Toristy products are unavailable.
+    ///   - braintree: issues the client token for Ticket Evolution checkouts; without it those products are unavailable.
     public func localCheckoutClient(catalog: LocalProductCatalog,
+                                    stripe: StripePaymentIntentProviding? = nil,
+                                    braintree: BraintreeClientTokenProviding? = nil,
                                     fallbackWebBase: String? = nil,
                                     contractVersion: String = BookingContract.version,
                                     identifiers: LocalIdentifiers = .random,
                                     now: @escaping @Sendable () -> Date = { Date() }) -> LocalCheckoutClient {
-        LocalCheckoutClient(viator: viator, store: store, catalog: catalog, contractVersion: contractVersion,
+        LocalCheckoutClient(viator: viator, toristy: toristy, stripe: stripe, victory: victory, braintree: braintree, store: store, catalog: catalog, contractVersion: contractVersion,
                             fallbackWebBase: fallbackWebBase, identifiers: identifiers, now: now)
     }
 
