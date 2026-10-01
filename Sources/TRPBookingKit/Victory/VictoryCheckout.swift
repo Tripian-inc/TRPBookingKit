@@ -5,6 +5,8 @@ public struct VictoryEventOffers: Sendable, Hashable {
     public let event: VictoryEvent
     /// Groups with at least one sellable quantity, cheapest first.
     public let ticketGroups: [VictoryTicketGroup]
+    /// Groups listed for the event that cannot be sold right now: no sellable quantity or no price, cheapest first.
+    public var soldOutGroups: [VictoryTicketGroup] = []
     /// The fixed day of the event in the venue's time, `nil` while TE has none.
     public var eventDate: BookingDate? {
         event.occursAtLocal.flatMap { BookingDate(String($0.prefix(10))) }
@@ -69,11 +71,13 @@ public actor VictoryCheckout {
     public func offers(eventId: Int) async throws -> VictoryEventOffers {
         async let event = service.event(id: eventId)
         async let groups = service.listings(eventId: eventId)
-        let sellable = try await groups
-            .filter { !$0.sellableQuantities.isEmpty && $0.retailPrice != nil && $0.wholesalePrice != nil }
+        let offered = try await groups
             .filter { !digitalOnly || $0.isDigital }
             .sorted { ($0.retailPrice ?? 0) < ($1.retailPrice ?? 0) }
-        return VictoryEventOffers(event: try await event, ticketGroups: sellable)
+        let isSellable: (VictoryTicketGroup) -> Bool = { !$0.sellableQuantities.isEmpty && $0.retailPrice != nil && $0.wholesalePrice != nil }
+        var offers = VictoryEventOffers(event: try await event, ticketGroups: offered.filter(isSellable))
+        offers.soldOutGroups = offered.filter { !isSellable($0) }
+        return offers
     }
 
     /// Prices a group and quantity with TE's tax quote; the quantity must be one of `sellableQuantities`.
@@ -185,7 +189,8 @@ public actor VictoryCheckout {
         record = BookingRecord(reference: placed, activityId: record.activityId, title: record.title, travelDate: record.travelDate,
                                status: order.state.recordStatus ?? record.status, total: order.total ?? record.total,
                                currency: record.currency, deadline: record.deadline, receipt: record.receipt,
-                               providerStatus: order.rawState ?? record.providerStatus, createdAt: record.createdAt)
+                               providerStatus: order.rawState ?? record.providerStatus, createdAt: record.createdAt,
+                               contractBooking: record.contractBooking)
         await store.save(record)
         return placed
     }

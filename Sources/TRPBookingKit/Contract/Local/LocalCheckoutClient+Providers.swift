@@ -30,6 +30,9 @@ extension LocalCheckoutClient {
             case .toristy:
                 guard let toristy, let stripe else { return nil }
                 return ToristyCheckoutFlow(context: context, toristy: toristy, stripe: stripe)
+            case .victory:
+                guard let victory, let braintree else { return nil }
+                return VictoryCheckoutFlow(context: context, victory: victory, braintree: braintree)
             default: return nil
             }
         }
