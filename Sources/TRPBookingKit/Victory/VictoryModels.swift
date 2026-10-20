@@ -10,6 +10,59 @@ public struct VictoryEvent: Sendable, Hashable, Decodable {
         public let timeZone: TimeZone?
         public let latitude: Double?
         public let longitude: Double?
+        public let address: Address?
+    }
+
+    /// The venue's postal address as TE lists it.
+    public struct Address: Sendable, Hashable {
+        public let streetAddress: String?
+        public let extendedAddress: String?
+        public let locality: String?
+        public let region: String?
+        public let postalCode: String?
+        public let countryCode: String?
+
+        public init(streetAddress: String? = nil, extendedAddress: String? = nil, locality: String? = nil, region: String? = nil,
+                    postalCode: String? = nil, countryCode: String? = nil) {
+            self.streetAddress = streetAddress
+            self.extendedAddress = extendedAddress
+            self.locality = locality
+            self.region = region
+            self.postalCode = postalCode
+            self.countryCode = countryCode
+        }
+
+        /// The non-empty parts joined by ", ", e.g. "226 W 46th St, New York, NY, 10036, US".
+        public var formatted: String {
+            [streetAddress, extendedAddress, locality, region, postalCode, countryCode]
+                .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
+                .filter { !$0.isEmpty }
+                .joined(separator: ", ")
+        }
+    }
+
+    /// A performer appearing at the event; `isPrimary` marks the headliner.
+    public struct Performer: Sendable, Hashable {
+        public let id: Int
+        public let name: String?
+        public let isPrimary: Bool
+
+        public init(id: Int, name: String?, isPrimary: Bool) {
+            self.id = id
+            self.name = name
+            self.isPrimary = isPrimary
+        }
+    }
+
+    /// The event's TE category, such as "Broadway".
+    public struct Category: Sendable, Hashable {
+        public let id: Int
+        public let name: String?
+
+        public init(id: Int, name: String?) {
+            self.id = id
+            self.name = name
+        }
     }
 
     public let id: Int
@@ -26,13 +79,21 @@ public struct VictoryEvent: Sendable, Hashable, Decodable {
     /// Static seat-map images, the practical option on a phone.
     public let seatingChartMedium: URL?
     public let seatingChartLarge: URL?
+    /// In the order TE lists them; empty when TE sends none.
+    public let performers: [Performer]
+    public let category: Category?
 
     private enum CodingKeys: String, CodingKey {
-        case id, name, state, tbd, venue, configuration
+        case id, name, state, tbd, venue, configuration, performances, category
         case occursAt = "occurs_at", occursAtLocal = "occurs_at_local", availableCount = "available_count"
     }
     private enum VenueKeys: String, CodingKey { case id, name, address, timeZone = "time_zone" }
-    private enum AddressKeys: String, CodingKey { case latitude, longitude }
+    private enum AddressKeys: String, CodingKey {
+        case latitude, longitude, locality, region
+        case streetAddress = "street_address", extendedAddress = "extended_address", postalCode = "postal_code"
+        case countryCode = "country_code"
+    }
+    private enum CategoryKeys: String, CodingKey { case id, name }
     private enum ConfigurationKeys: String, CodingKey { case id, seatingChart = "seating_chart" }
     private enum ChartKeys: String, CodingKey { case medium, large }
 
@@ -55,7 +116,8 @@ public struct VictoryEvent: Sendable, Hashable, Decodable {
                           name: venueContainer.flexibleString(.name),
                           timeZone: venueContainer.flexibleString(.timeZone).flatMap(TimeZone.init(identifier:)),
                           latitude: address?.flexibleDecimal(.latitude).map { NSDecimalNumber(decimal: $0).doubleValue },
-                          longitude: address?.flexibleDecimal(.longitude).map { NSDecimalNumber(decimal: $0).doubleValue })
+                          longitude: address?.flexibleDecimal(.longitude).map { NSDecimalNumber(decimal: $0).doubleValue },
+                          address: address.flatMap(Self.postalAddress))
         } else {
             venue = nil
         }
@@ -65,6 +127,84 @@ public struct VictoryEvent: Sendable, Hashable, Decodable {
         let chart = try? configuration?.nestedContainer(keyedBy: ChartKeys.self, forKey: .seatingChart)
         seatingChartMedium = chart?.flexibleString(.medium).flatMap(URL.init(string:))
         seatingChartLarge = chart?.flexibleString(.large).flatMap(URL.init(string:))
+
+        performers = container.lossyArray(.performances).map { (performance: VictoryPerformance) in performance.performer }
+        let category = try? container.nestedContainer(keyedBy: CategoryKeys.self, forKey: .category)
+        self.category = category.flatMap { keyed in keyed.flexibleInt(.id).map { Category(id: $0, name: keyed.flexibleString(.name)) } }
+    }
+
+    private static func postalAddress(_ container: KeyedDecodingContainer<AddressKeys>) -> Address? {
+        let address = Address(streetAddress: container.flexibleString(.streetAddress),
+                              extendedAddress: container.flexibleString(.extendedAddress),
+                              locality: container.flexibleString(.locality), region: container.flexibleString(.region),
+                              postalCode: container.flexibleString(.postalCode), countryCode: container.flexibleString(.countryCode))
+        return address.formatted.isEmpty ? nil : address
+    }
+}
+
+/// One entry of TE's `performances`: `{ "performer": { "id", "name" }, "primary" }`.
+private struct VictoryPerformance: Decodable {
+    let performer: VictoryEvent.Performer
+
+    private enum CodingKeys: String, CodingKey { case performer, primary }
+    private enum PerformerKeys: String, CodingKey { case id, name }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let nested = try container.nestedContainer(keyedBy: PerformerKeys.self, forKey: .performer)
+        guard let id = nested.flexibleInt(.id) else {
+            throw DecodingError.keyNotFound(PerformerKeys.id, .init(codingPath: nested.codingPath, debugDescription: "performer id"))
+        }
+        performer = VictoryEvent.Performer(id: id, name: nested.flexibleString(.name), isPrimary: container.flexibleBool(.primary) ?? false)
+    }
+}
+
+/// `GET /v9/events`: `{ "events": [...] }`, with a missing key read as no events.
+struct VictoryEventsResponse: Decodable {
+    let events: [VictoryEvent]
+
+    private enum CodingKeys: String, CodingKey { case events }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        events = container.lossyArray(.events)
+    }
+}
+
+/// The events near a point within a time window, as TE's `GET /v9/events` takes them.
+public struct VictoryEventSearch: Sendable, Hashable {
+    public var latitude: Double
+    public var longitude: Double
+    /// Inclusive start of the window (`occurs_at.gte`).
+    public var from: Date
+    /// Exclusive end of the window (`occurs_at.lt`).
+    public var to: Date
+    public var categoryId: Int?
+    public var perPage: Int
+
+    public init(latitude: Double, longitude: Double, from: Date, to: Date, categoryId: Int? = nil, perPage: Int = 100) {
+        self.latitude = latitude
+        self.longitude = longitude
+        self.from = from
+        self.to = to
+        self.categoryId = categoryId
+        self.perPage = perPage
+    }
+
+    /// `lat`, `lon`, `occurs_at.gte`, `occurs_at.lt`, `category_id` when set and `per_page`, times in UTC.
+    var queryItems: [URLQueryItem] {
+        var items = [URLQueryItem(name: "lat", value: Self.coordinate(latitude)),
+                     URLQueryItem(name: "lon", value: Self.coordinate(longitude)),
+                     URLQueryItem(name: "occurs_at.gte", value: LocalFormat.iso(from)),
+                     URLQueryItem(name: "occurs_at.lt", value: LocalFormat.iso(to))]
+        if let categoryId { items.append(URLQueryItem(name: "category_id", value: String(categoryId))) }
+        items.append(URLQueryItem(name: "per_page", value: String(perPage)))
+        return items
+    }
+
+    /// A coordinate with six fixed decimals, never in exponent form, e.g. `-73.986600`.
+    static func coordinate(_ value: Double) -> String {
+        String(format: "%.6f", locale: Locale(identifier: "en_US_POSIX"), value)
     }
 }
 

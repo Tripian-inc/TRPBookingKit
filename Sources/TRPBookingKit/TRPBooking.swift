@@ -23,13 +23,13 @@ public final class TRPBooking: Sendable {
 
     public let configuration: BookingConfiguration
     public let store: BookingRecordStore
-    /// `nil` unless Toristy has credentials and the host supplied a `PaymentProcessing`.
+    /// `nil` unless Toristy has credentials. Without a `PaymentProcessing` it is paid on its hosted cart only.
     public let toristy: ToristyCheckout?
     public let viator: ViatorCheckout?
     public let victory: VictoryCheckout?
 
     /// - Parameters:
-    ///   - toristyPayment: charges the customer for Toristy, which leaves payment to us.
+    ///   - toristyPayment: charges the customer for Toristy when `toristyPaymentMode` is `.stripe`.
     ///   - victoryAuthorizer: signs Victory requests; pass the host's own to sign on a backend
     ///     proxy set as `VictoryCredentials.baseURL`. `nil` signs on the device.
     public init(configuration: BookingConfiguration,
@@ -40,17 +40,19 @@ public final class TRPBooking: Sendable {
                 backgroundTasks: BackgroundTaskRunning = BookingConfiguration.defaultBackgroundTaskRunner) {
         self.configuration = configuration
         self.store = store
-        toristy = zip(configuration.toristy, toristyPayment).map { credentials, payment in
+        toristy = configuration.toristy.map { credentials in
             ToristyCheckout(service: ToristyAPIClient(credentials: credentials, transport: transport),
-                            payment: payment, store: store, backgroundTasks: backgroundTasks)
+                            hostedCart: ToristyHostedCart(credentials: credentials), payment: toristyPayment,
+                            store: store, backgroundTasks: backgroundTasks)
         }
         viator = configuration.viator.map { credentials in
             ViatorCheckout(service: ViatorAPIClient(credentials: credentials, languageCode: configuration.languageCode, transport: transport),
-                           store: store, backgroundTasks: backgroundTasks)
+                           store: store, languageCode: configuration.languageCode, backgroundTasks: backgroundTasks)
         }
         victory = configuration.victory.map { credentials in
             VictoryCheckout(service: VictoryAPIClient(credentials: credentials, authorizer: victoryAuthorizer, transport: transport),
-                            store: store, backgroundTasks: backgroundTasks)
+                            store: store, backgroundTasks: backgroundTasks,
+                            hostedCheckout: VictoryHostedCheckout(credentials: credentials))
         }
     }
 
@@ -98,9 +100,29 @@ public final class TRPBooking: Sendable {
         return await store.all()
     }
 
+    /// Runs `resolveUnfinished()` and answers every confirmed contract booking the host has not acknowledged, so the
+    /// host can record them exactly like a booking a checkout confirmed. A booking stays in the answer on every run
+    /// until `acknowledge(bookingUuid:)` is called for it, so one the host failed to record is offered again.
+    public func resolveUnfinishedBookings() async -> [BookingContract.Booking] {
+        await resolveUnfinished()
+        return await store.all().filter(\.awaitsAcknowledgement).compactMap(\.contractBooking)
+    }
+
+    /// Records that the host has recorded the confirmed booking with `bookingUuid`, so
+    /// `resolveUnfinishedBookings()` no longer answers it. Unknown uuids are ignored.
+    public func acknowledge(bookingUuid: String) async {
+        guard let record = await store.all().first(where: { $0.contractBooking?.uuid == bookingUuid }),
+              record.acknowledgedAt == nil else { return }
+        await store.update(record.reference) { $0.acknowledgedAt = Date() }
+    }
+
     public func records() async -> [BookingRecord] {
         await store.all()
     }
+}
+
+private extension BookingRecord {
+    var awaitsAcknowledgement: Bool { status == .confirmed && contractBooking != nil && acknowledgedAt == nil }
 }
 
 private func zip<A, B>(_ first: A?, _ second: B?) -> (A, B)? {

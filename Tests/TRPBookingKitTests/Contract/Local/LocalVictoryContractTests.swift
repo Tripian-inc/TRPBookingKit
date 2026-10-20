@@ -10,6 +10,7 @@ final class LocalVictoryContractTests: XCTestCase {
     private let directory = "victory"
     private var clock: TestClock!
     private var service: MockVictoryBookingService!
+    private var braintree: MockBraintreeClientToken!
     private var store: InMemoryBookingRecordStore!
     private var checkout: LocalCheckoutClient!
     private var bookings: LocalBookingClient!
@@ -32,6 +33,7 @@ final class LocalVictoryContractTests: XCTestCase {
         service.createClientResult = .success(try decodeJSON(VictoryClient.self,
                                                              #"{"id":1,"email_addresses":[{"id":2}],"addresses":[{"id":3}]}"#))
         service.placeOrderResult = .success(try decodeJSON(VictoryOrder.self, #"{"id":"TE-ORD-5531902","state":"pending","total":212.40}"#))
+        braintree = MockBraintreeClientToken()
         store = InMemoryBookingRecordStore()
         let now: @Sendable () -> Date = { [clock] in clock!.now }
         let victory = VictoryCheckout(service: service, store: store, backgroundTasks: ImmediateTaskRunner(), statusAttempts: 1,
@@ -42,7 +44,7 @@ final class LocalVictoryContractTests: XCTestCase {
             durationMinutes: 165,
             meetingPoint: .init(name: "Richard Rodgers Theatre", address: "226 W 46th St, New York, NY 10036",
                                 lat: 40.759, lng: -73.9866))
-        checkout = LocalCheckoutClient(viator: nil, victory: victory, braintree: MockBraintreeClientToken(), store: store,
+        checkout = LocalCheckoutClient(viator: nil, victory: victory, braintree: braintree, store: store,
                                        catalog: StaticProductCatalog([product]), fallbackWebBase: "https://book.tripian.com/c/",
                                        identifiers: .sequence(["chk_01J9ZV3R6Q", "act_01J9ZV9K"]), now: now)
         bookings = LocalBookingClient(store: store, viator: nil, toristy: nil, contractVersion: BookingContract.version, now: now)
@@ -72,6 +74,51 @@ final class LocalVictoryContractTests: XCTestCase {
         try await assertLocalSnapshot("victory/errors", "NOT_CANCELLABLE", checkout: checkout, bookings: bookings)
     }
 
+    func testCanceledPaymentLeavesCheckoutUnchanged() async throws {
+        try await replay(Self.flow[0..<5])
+        let recordsBefore = await store.all().map(\.status)
+        let response = try await checkout.action(checkoutId: "chk_01J9ZV3R6Q", actionId: "act_01J9ZV9K",
+                                                 result: BookingContract.ActionResult(status: .init(.canceled)), lang: "en")
+        XCTAssertEqual(response.checkout.status.value, .awaitingPayment)
+        XCTAssertEqual(response.checkout.nextAction?.id, "act_01J9ZV9K")
+        XCTAssertEqual(response.checkout.allowedActions.map(\.value), [.back, .cancel])
+        XCTAssertEqual(braintree.callCount, 1)
+        XCTAssertEqual(service.placeOrderCallCount, 0)
+        let recordsAfter = await store.all().map(\.status)
+        XCTAssertEqual(recordsAfter, recordsBefore)
+    }
+
+    func testBackFromAwaitingPaymentShowsBuyerAndKeepsQuote() async throws {
+        try await replay(Self.flow[0..<5])
+        let quotes = service.taxQuoteCallCount
+        let back = try await checkout.back(checkoutId: "chk_01J9ZV3R6Q", fromStepId: "buyer", lang: "en")
+        XCTAssertEqual(back.checkout.status.value, .collectingDetails)
+        XCTAssertEqual(back.checkout.currentStep?.id, "buyer")
+        XCTAssertNil(back.checkout.nextAction)
+        XCTAssertTrue(back.checkout.allowedActions.contains { $0.value == .submit })
+        let resubmitted = try await checkout.submit(checkoutId: "chk_01J9ZV3R6Q", stepId: "buyer", answers: Self.buyerAnswers, lang: "en")
+        XCTAssertEqual(resubmitted.checkout.status.value, .awaitingPayment)
+        XCTAssertNotNil(resubmitted.checkout.nextAction)
+        XCTAssertEqual(service.taxQuoteCallCount, quotes)
+        XCTAssertEqual(service.placeOrderCallCount, 0)
+    }
+
+    func testBackFromAwaitingPaymentRejectsOtherStep() async throws {
+        try await replay(Self.flow[0..<5])
+        do {
+            _ = try await checkout.back(checkoutId: "chk_01J9ZV3R6Q", fromStepId: "summary", lang: "en")
+            XCTFail("Expected STEP_MISMATCH")
+        } catch let error as BookingContract.ContractError {
+            XCTAssertEqual(error.data.code.value, .stepMismatch)
+        }
+    }
+
+    private static let buyerAnswers: BookingContract.Answers = [
+        "buyer.firstName": "Maya", "buyer.lastName": "Brooks", "buyer.email": "maya@example.com", "buyer.phone": "+12125550143",
+        "billing.address1": "350 W 50th St", "billing.city": "New York", "billing.postalCode": "10019", "billing.country": "US",
+        "billing.state": "NY", "terms": true
+    ]
+
     /// The event's three groups; the rear mezzanine never has seats, the mezzanine has `mezzanineAvailable`.
     private static func groups(mezzanineAvailable: Int) throws -> [VictoryTicketGroup] {
         try [
@@ -93,8 +140,11 @@ final class LocalVictoryContractTests: XCTestCase {
 }
 
 /// A Braintree that hands out one fixed client token.
-struct MockBraintreeClientToken: BraintreeClientTokenProviding {
+final class MockBraintreeClientToken: BraintreeClientTokenProviding, @unchecked Sendable {
+    var callCount = 0
+
     func clientToken() async throws -> String {
-        "bt_ct_sandbox_6xk2p9q4z8m1"
+        callCount += 1
+        return "bt_ct_sandbox_6xk2p9q4z8m1"
     }
 }

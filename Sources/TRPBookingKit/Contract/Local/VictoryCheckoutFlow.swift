@@ -54,15 +54,14 @@ final class VictoryCheckoutFlow: ProviderCheckoutFlow {
     }
 
     func back() async throws {
-        guard let stepId = snapshot.step?.id, let index = Self.steps.firstIndex(of: stepId), index > 0 else {
-            throw FlowRejection.stepMismatch
-        }
-        show(Self.steps[index - 1])
+        guard let stepId = snapshot.backStepId(in: Self.steps) else { throw FlowRejection.stepMismatch }
+        show(stepId)
     }
 
     func act(result: BC.ActionResult) async throws {
+        if result.status?.value == .canceled { return }
         guard let quote, let buyer else { throw FlowRejection.stepMismatch }
-        guard let nonce = result.nonce, !nonce.isEmpty, result.status?.value != .canceled else {
+        guard let nonce = result.nonce, !nonce.isEmpty else {
             try await offerPayment()
             throw FlowRejection.paymentDeclined
         }
@@ -196,7 +195,8 @@ final class VictoryCheckoutFlow: ProviderCheckoutFlow {
         }
         snapshot.status = .awaitingPayment
         snapshot.step = nil
-        snapshot.allowed = [.cancel]
+        snapshot.paymentStepId = Self.steps.last
+        snapshot.allowed = [.back, .cancel]
         snapshot.nextAction = .braintreeDropin(BC.NextAction.Payload(
             id: context.identifiers.next("act_"),
             params: BC.BraintreeDropinParams(clientToken: clientToken, amount: LocalFormat.money(quote.total, quote.currency)),

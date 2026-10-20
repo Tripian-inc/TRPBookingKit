@@ -12,6 +12,16 @@ public protocol VictoryBookingService: Sendable {
     /// Orders placed with our own `reference`, used to find out whether an order whose answer was
     /// lost went through.
     func orders(reference: String) async throws -> [VictoryOrder]
+    /// Events near a point within a time window, for browsing before a checkout.
+    func events(_ search: VictoryEventSearch) async throws -> [VictoryEvent]
+}
+
+extension VictoryBookingService {
+
+    /// Conformers written before event search existed have none; they answer `providerNotConfigured(.victory)`.
+    public func events(_ search: VictoryEventSearch) async throws -> [VictoryEvent] {
+        throw BookingError.providerNotConfigured(.victory)
+    }
 }
 
 /// Calls Ticket Evolution with signed requests.
@@ -36,6 +46,11 @@ public struct VictoryAPIClient: VictoryBookingService {
 
     public func event(id: Int) async throws -> VictoryEvent {
         try await client.request(.get, "v9/events/\(id)")
+    }
+
+    public func events(_ search: VictoryEventSearch) async throws -> [VictoryEvent] {
+        let response: VictoryEventsResponse = try await client.request(.get, "v9/events", query: search.queryItems)
+        return response.events
     }
 
     public func listings(eventId: Int) async throws -> [VictoryTicketGroup] {

@@ -43,6 +43,8 @@ public actor VictoryCheckout {
 
     public static let currency = "USD"
 
+    /// TE's hosted checkout page, used instead of a Braintree order with `VictoryPaymentMode.hostedCheckout`.
+    public nonisolated let hostedCheckout: VictoryHostedCheckout?
     private let service: VictoryBookingService
     private let store: BookingRecordStore
     private let backgroundTasks: BackgroundTaskRunning
@@ -51,14 +53,18 @@ public actor VictoryCheckout {
     private let retryDelay: TimeInterval
     private let now: @Sendable () -> Date
 
-    /// - Parameter digitalOnly: offer only groups delivered by email, which keeps shipping out of the flow.
+    /// - Parameters:
+    ///   - digitalOnly: offer only groups delivered by email, which keeps shipping out of the flow.
+    ///   - hostedCheckout: TE's hosted checkout page, for `VictoryPaymentMode.hostedCheckout`.
     public init(service: VictoryBookingService,
                 store: BookingRecordStore,
                 backgroundTasks: BackgroundTaskRunning = BookingConfiguration.defaultBackgroundTaskRunner,
                 digitalOnly: Bool = true,
                 statusAttempts: Int = 3,
                 retryDelay: TimeInterval = 2,
-                now: @escaping @Sendable () -> Date = { Date() }) {
+                now: @escaping @Sendable () -> Date = { Date() },
+                hostedCheckout: VictoryHostedCheckout? = nil) {
+        self.hostedCheckout = hostedCheckout
         self.service = service
         self.store = store
         self.backgroundTasks = backgroundTasks
@@ -78,6 +84,22 @@ public actor VictoryCheckout {
         var offers = VictoryEventOffers(event: try await event, ticketGroups: offered.filter(isSellable))
         offers.soldOutGroups = offered.filter { !isSellable($0) }
         return offers
+    }
+
+    /// The event and every group TE lists with tickets left, cheapest first, for the hosted checkout page,
+    /// which handles delivery and pricing itself.
+    func listedGroups(eventId: Int) async throws -> (event: VictoryEvent, groups: [VictoryTicketGroup]) {
+        async let event = service.event(id: eventId)
+        async let groups = service.listings(eventId: eventId)
+        let listed = try await groups
+            .filter { $0.availableQuantity > 0 }
+            .sorted { ($0.retailPrice ?? 0) < ($1.retailPrice ?? 0) }
+        return (try await event, listed)
+    }
+
+    /// Events near a point within a time window.
+    public func events(_ search: VictoryEventSearch) async throws -> [VictoryEvent] {
+        try await service.events(search)
     }
 
     /// Prices a group and quantity with TE's tax quote; the quantity must be one of `sellableQuantities`.

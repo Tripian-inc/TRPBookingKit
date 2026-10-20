@@ -240,6 +240,102 @@ final class VictoryModelsTests: XCTestCase {
         XCTAssertEqual(body.message, "e1\ne2")
         XCTAssertEqual(body.error, "e1")
     }
+
+    // MARK: - VictoryEvent.venue.address, performers, category
+
+    func testEventDecodesVenueAddressPerformersAndCategory() throws {
+        let json = """
+        {
+          "id": 2817364,
+          "name": "Hamilton",
+          "venue": {
+            "name": "Richard Rodgers Theatre",
+            "address": {
+              "street_address": "226 W 46th St",
+              "extended_address": "Floor 2",
+              "locality": "New York",
+              "region": "NY",
+              "postal_code": "10036",
+              "country_code": "US"
+            }
+          },
+          "performances": [
+            {"performer": {"id": 1, "name": "Lin-Manuel Miranda"}, "primary": false},
+            {"performer": {"id": 2, "name": "Hamilton Cast"}, "primary": true},
+            {"performer": {"name": "Missing Id"}, "primary": false}
+          ],
+          "category": {"id": 7, "name": "Theatre"}
+        }
+        """
+        let event = try decodeJSON(VictoryEvent.self, json)
+
+        XCTAssertEqual(event.venue?.address?.formatted, "226 W 46th St, Floor 2, New York, NY, 10036, US")
+        XCTAssertEqual(event.performers.count, 2)
+        XCTAssertEqual(event.performers.compactMap(\.name), ["Lin-Manuel Miranda", "Hamilton Cast"])
+        XCTAssertFalse(event.performers[0].isPrimary)
+        XCTAssertTrue(event.performers[1].isPrimary)
+        XCTAssertEqual(event.category?.id, 7)
+        XCTAssertEqual(event.category?.name, "Theatre")
+    }
+
+    func testEventOmitsVenueAddressPerformersAndCategoryWhenAbsent() throws {
+        let json = #"{"id": 1, "venue": {"name": "Arena"}}"#
+        let event = try decodeJSON(VictoryEvent.self, json)
+
+        XCTAssertNil(event.venue?.address)
+        XCTAssertEqual(event.performers, [])
+        XCTAssertNil(event.category)
+    }
+
+    func testAddressFormattedJoinsOnlyNonEmptyFieldsTrimmed() throws {
+        let json = #"{"id": 1, "venue": {"name": "Arena", "address": {"locality": " New York ", "country_code": "US"}}}"#
+        let event = try decodeJSON(VictoryEvent.self, json)
+
+        XCTAssertEqual(event.venue?.address?.formatted, "New York, US")
+    }
+
+    // MARK: - VictoryEventsResponse
+
+    func testEventsResponseDecodesAnEmptyEventsArray() throws {
+        let response = try decodeJSON(VictoryEventsResponse.self, #"{"events":[]}"#)
+        XCTAssertEqual(response.events, [])
+    }
+
+    func testEventsResponseDefaultsToNoEventsWhenTheKeyIsMissing() throws {
+        let response = try decodeJSON(VictoryEventsResponse.self, "{}")
+        XCTAssertEqual(response.events, [])
+    }
+
+    func testEventsResponseDecodesOneEvent() throws {
+        let response = try decodeJSON(VictoryEventsResponse.self, #"{"events":[{"id":2817364,"name":"Hamilton"}]}"#)
+        XCTAssertEqual(response.events.count, 1)
+        XCTAssertEqual(response.events.first?.id, 2817364)
+    }
+
+    // MARK: - VictoryHostedCheckout
+
+    func testHostedCheckoutURLIsTheSameWhetherOrNotTheBaseEndsInASlash() {
+        let withSlash = VictoryHostedCheckout(baseURL: URL(string: "https://checkout.ticketevolution.com/")!)
+        let withoutSlash = VictoryHostedCheckout(baseURL: URL(string: "https://checkout.ticketevolution.com")!)
+
+        let urlWithSlash = withSlash.url(eventId: 2817364, ticketGroupId: 88121, quantity: 2)
+        let urlWithoutSlash = withoutSlash.url(eventId: 2817364, ticketGroupId: 88121, quantity: 2)
+
+        XCTAssertEqual(urlWithSlash, urlWithoutSlash)
+        XCTAssertEqual(urlWithSlash.absoluteString, "https://checkout.ticketevolution.com/checkout/payment/2817364/88121?quantity=2")
+    }
+
+    func testHostedCheckoutInitFromCredentialsIsNilWithoutACheckoutBaseURL() {
+        let credentials = VictoryCredentials(token: "tok", secret: "sekret", environment: .sandbox)
+        XCTAssertNil(VictoryHostedCheckout(credentials: credentials))
+    }
+
+    func testHostedCheckoutInitFromCredentialsUsesTheCheckoutBaseURL() throws {
+        let credentials = VictoryCredentials(token: "tok", secret: "sekret", environment: .sandbox,
+                                             checkoutBaseURL: URL(string: "https://checkout.ticketevolution.com")!)
+        let hosted = try XCTUnwrap(VictoryHostedCheckout(credentials: credentials))
+        XCTAssertEqual(hosted.baseURL, URL(string: "https://checkout.ticketevolution.com")!)
+    }
 }
 
 private func encodeToJSONObject<T: Encodable>(_ value: T) throws -> [String: Any] {

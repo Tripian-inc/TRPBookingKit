@@ -9,6 +9,7 @@ final class MockVictoryBookingService: VictoryBookingService, @unchecked Sendabl
     var placeOrderResult: Result<VictoryOrder, Error>?
     var orderResult: Result<VictoryOrder, Error>?
     var ordersResult: Result<[VictoryOrder], Error>?
+    var eventsResult: Result<[VictoryEvent], Error>?
 
     var eventCallCount = 0
     var listingsCallCount = 0
@@ -17,6 +18,8 @@ final class MockVictoryBookingService: VictoryBookingService, @unchecked Sendabl
     var placeOrderCallCount = 0
     var orderCallCount = 0
     var ordersCallCount = 0
+    var eventsCallCount = 0
+    private(set) var eventSearches: [VictoryEventSearch] = []
 
     var ordersHandler: ((String) -> Result<[VictoryOrder], Error>)?
 
@@ -56,6 +59,12 @@ final class MockVictoryBookingService: VictoryBookingService, @unchecked Sendabl
             return try ordersHandler(reference).get()
         }
         return try unwrap(ordersResult)
+    }
+
+    func events(_ search: VictoryEventSearch) async throws -> [VictoryEvent] {
+        eventsCallCount += 1
+        eventSearches.append(search)
+        return try unwrap(eventsResult)
     }
 
     private func unwrap<T>(_ result: Result<T, Error>?) throws -> T {
