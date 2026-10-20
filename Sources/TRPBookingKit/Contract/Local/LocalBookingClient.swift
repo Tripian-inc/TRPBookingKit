@@ -103,6 +103,14 @@ extension BookingContract.Booking {
                                 cancellation: cancellation ?? self.cancellation, refund: refund ?? self.refund, contact: contact)
     }
 
+    /// A copy carrying another provider reference.
+    func with(providerReference: String?) -> BookingContract.Booking {
+        BookingContract.Booking(uuid: uuid, status: status, provider: provider, providerReference: providerReference,
+                                product: product, units: units, start: start, durationMinutes: durationMinutes,
+                                meetingPoint: meetingPoint, amount: amount, utcExpiresAt: utcExpiresAt, vouchers: vouchers,
+                                cancellation: cancellation, refund: refund, contact: contact)
+    }
+
     /// The booking after a cancellation the supplier accepted: no vouchers, and the refund on its way.
     func cancelled() -> BookingContract.Booking {
         let policyAmount = cancellation.refundAmount

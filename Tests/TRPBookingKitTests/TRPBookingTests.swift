@@ -171,4 +171,55 @@ final class TRPBookingTests: XCTestCase {
         let resolved = await booking.resolveUnfinished()
         XCTAssertEqual(resolved.map(\.id), [record.id])
     }
+
+    func testResolveUnfinishedBookingsAnswersAConfirmedBookingOnEveryRunUntilItIsAcknowledged() async {
+        let store = InMemoryBookingRecordStore()
+        var acknowledged = makeRecord("acknowledged", status: .confirmed, contract: makeContractBooking("uuid-acknowledged"))
+        acknowledged.acknowledgedAt = Date()
+        await store.save(makeRecord("confirmed", status: .confirmed, contract: makeContractBooking("uuid-confirmed")))
+        await store.save(acknowledged)
+        await store.save(makeRecord("held", status: .held, pending: makeContractBooking("uuid-held")))
+        await store.save(makeRecord("failed", status: .failed, contract: makeContractBooking("uuid-failed")))
+        let booking = TRPBooking(configuration: BookingConfiguration(registry: registry), store: store)
+
+        let firstRun = await booking.resolveUnfinishedBookings()
+        let unacknowledgedRun = await booking.resolveUnfinishedBookings()
+        await booking.acknowledge(bookingUuid: "uuid-confirmed")
+        let acknowledgedRun = await booking.resolveUnfinishedBookings()
+
+        XCTAssertEqual(firstRun.map(\.uuid), ["uuid-confirmed"])
+        XCTAssertEqual(unacknowledgedRun.map(\.uuid), ["uuid-confirmed"])
+        XCTAssertEqual(acknowledgedRun.map(\.uuid), [])
+        let records = await store.all()
+        XCTAssertNotNil(records.first { $0.contractBooking?.uuid == "uuid-confirmed" }?.acknowledgedAt)
+    }
+
+    func testAcknowledgingAnUnknownBookingChangesNothing() async {
+        let store = InMemoryBookingRecordStore()
+        let record = makeRecord("confirmed", status: .confirmed, contract: makeContractBooking("uuid-confirmed"))
+        await store.save(record)
+        let booking = TRPBooking(configuration: BookingConfiguration(registry: registry), store: store)
+
+        await booking.acknowledge(bookingUuid: "uuid-unknown")
+
+        let records = await store.all()
+        XCTAssertEqual(records, [record])
+    }
+
+    private func makeRecord(_ primary: String, status: BookingRecordStatus,
+                            contract: BookingContract.Booking? = nil, pending: BookingContract.Booking? = nil) -> BookingRecord {
+        BookingRecord(reference: BookingReference(provider: .toristy, primary: primary), activityId: "C_1_1", title: "Tour",
+                      travelDate: nil, status: status, contractBooking: contract, pendingContractBooking: pending)
+    }
+
+    private func makeContractBooking(_ uuid: String) -> BookingContract.Booking {
+        BookingContract.Booking(
+            uuid: uuid, status: .init(.confirmed), provider: "toristy", providerReference: "TRS-1",
+            product: BookingContract.Product(id: "p-1", optionId: nil, title: "Tour", imageUrl: nil),
+            units: ["ADULT": 1], start: BookingContract.Booking.Start(date: "2026-10-15", time: "09:30", timezone: "UTC"),
+            durationMinutes: nil, meetingPoint: nil, amount: BookingContract.Money(amount: "10.00", currency: "EUR"),
+            utcExpiresAt: nil, vouchers: [],
+            cancellation: BookingContract.Booking.Cancellation(allowed: false, deadline: nil, refund: .init(.none), refundAmount: nil),
+            refund: nil, contact: BookingContract.Booking.Contact(name: "Jane Doe", email: "jane@example.com"))
+    }
 }

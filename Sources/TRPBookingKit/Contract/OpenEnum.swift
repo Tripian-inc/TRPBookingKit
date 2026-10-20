@@ -53,12 +53,15 @@ extension BookingContract {
     public enum CheckoutStatus: String, ContractEnum {
         case collectingDetails = "collecting_details"
         case awaitingPayment = "awaiting_payment"
-        case processing, confirmed, pending, failed, expired, cancelled, unknown
+        case processing, confirmed, pending, failed, expired, cancelled
+        /// The provider's own page took the customer over; whether they bought anything is not known to us.
+        case handedOff = "handed_off"
+        case unknown
 
         /// Whether no further transition will follow.
         public var isTerminal: Bool {
             switch self {
-            case .confirmed, .pending, .failed, .expired, .cancelled: return true
+            case .confirmed, .pending, .failed, .expired, .cancelled, .handedOff: return true
             case .collectingDetails, .awaitingPayment, .processing, .unknown: return false
             }
         }
@@ -79,6 +82,7 @@ extension BookingContract {
     public enum NextActionType: String, ContractEnum {
         case stripePaymentIntent = "stripe_payment_intent"
         case providerHostedForm = "provider_hosted_form"
+        case providerHostedCart = "provider_hosted_cart"
         case braintreeDropin = "braintree_dropin"
         case redirect
         case threeDS = "three_ds"
@@ -154,6 +158,9 @@ extension BookingContract {
 
     /// `ActionResult.status`.
     public enum ActionStatus: String, ContractEnum {
-        case succeeded, canceled, unknown
+        case succeeded, canceled
+        /// The customer left a provider page whose outcome is not reported back, see `ProviderHostedCartParams.Settlement.handOff`.
+        case handedOff = "handed_off"
+        case unknown
     }
 }

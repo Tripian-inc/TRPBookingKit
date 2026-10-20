@@ -65,9 +65,17 @@ public protocol CheckoutClient: Sendable {
     /// `POST /checkouts/{id}/cancel`.
     func cancel(checkoutId: String, lang: String,
                 idempotencyKey: BookingContract.IdempotencyKey) async throws -> BookingContract.CheckoutResponse
+
+    /// `GET /checkouts/{id}/actions/{actionId}/settlement`: whether a payment the client cannot observe, such as a
+    /// provider hosted cart, has been made. A client that cannot tell answers `pending`.
+    func settlement(checkoutId: String, actionId: String) async throws -> BookingContract.ActionSettlement
 }
 
 extension CheckoutClient {
+
+    public func settlement(checkoutId: String, actionId: String) async throws -> BookingContract.ActionSettlement {
+        .pending
+    }
 
     /// `create` with a fresh idempotency key.
     public func create(_ request: BookingContract.CreateCheckoutRequest) async throws -> BookingContract.CheckoutResponse {

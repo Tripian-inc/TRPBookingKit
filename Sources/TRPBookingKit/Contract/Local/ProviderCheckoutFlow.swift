@@ -11,6 +11,8 @@ struct FlowSnapshot {
     var holdExpiresAt: Date?
     var priceValidUntil: Date?
     var step: BC.Step?
+    /// The step whose submit offered the payment; `back` returns to it from `awaiting_payment`.
+    var paymentStepId: String?
     var nextAction: BC.NextAction?
     var allowed: [BC.AllowedAction] = [.submit, .cancel]
     var bookingStatus: BC.BookingStatus?
@@ -19,18 +21,31 @@ struct FlowSnapshot {
     var retryAfter: TimeInterval?
 
     var isFinished: Bool {
-        [.confirmed, .pending, .failed, .expired, .cancelled].contains(status)
+        [.confirmed, .pending, .failed, .expired, .cancelled, .handedOff].contains(status)
     }
 
     var nextActionId: String? {
         switch nextAction {
         case .stripePaymentIntent(let payload)?: return payload.id
         case .providerHostedForm(let payload)?: return payload.id
+        case .providerHostedCart(let payload)?: return payload.id
         case .braintreeDropin(let payload)?: return payload.id
         case .redirect(let payload)?: return payload.id
         case .threeDS(let payload)?: return payload.id
         default: return nil
         }
+    }
+
+    /// The step the customer last saw: the current step, or the payment step while payment is offered.
+    var shownStepId: String? {
+        step?.id ?? (status == .awaitingPayment ? paymentStepId : nil)
+    }
+
+    /// The step `back` shows from the current state, or `nil` when there is none before it.
+    func backStepId(in steps: [String]) -> String? {
+        guard let current = step?.id else { return shownStepId }
+        guard let index = steps.firstIndex(of: current), index > 0 else { return nil }
+        return steps[index - 1]
     }
 
     mutating func clearHold() {
@@ -109,7 +124,10 @@ protocol ProviderCheckoutFlow: AnyObject {
     /// Builds the first step.
     func start() async throws
     func submit(answers: BookingContract.Answers, expectedAmount: BookingContract.Money?) async throws
+    /// Shows the previous step, or from `awaiting_payment` the step that offered the payment, keeping the hold.
     func back() async throws
+    /// Settles the payment form's result; a `canceled` result leaves the checkout and its `nextAction` unchanged
+    /// unless the flow releases what the action was paying for.
     func act(result: BookingContract.ActionResult) async throws
     /// Brings a checkout that is still processing up to date; called on every `get`.
     func refresh() async
@@ -118,10 +136,14 @@ protocol ProviderCheckoutFlow: AnyObject {
     func cancel() async
     /// Marks the provider's record of an expired hold.
     func expire() async
+    /// Whether the payment behind `actionId` has settled at the provider, for actions the client cannot observe.
+    func settlement(of actionId: String) async throws -> BookingContract.ActionSettlement
 }
 
 extension ProviderCheckoutFlow {
     func refresh() async {}
+
+    func settlement(of actionId: String) async throws -> BookingContract.ActionSettlement { .pending }
 
     func extend() async throws { throw FlowRejection.stepMismatch }
 }
@@ -134,6 +156,11 @@ struct StepAnswers {
     mutating func record(_ answers: BookingContract.Answers, for stepId: String) {
         byStep[stepId] = answers
         if !order.contains(stepId) { order.append(stepId) }
+    }
+
+    mutating func forget(_ stepId: String) {
+        byStep[stepId] = nil
+        order.removeAll { $0 == stepId }
     }
 
     func value(_ id: String) -> BookingContract.JSONValue? {

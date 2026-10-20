@@ -81,6 +81,26 @@ public final class RemoteCheckoutClient: CheckoutClient, Sendable {
                        body: BookingContract.LangRequest(lang: lang), idempotencyKey: idempotencyKey)
     }
 
+    /// `GET /checkouts/{id}/actions/{actionId}/settlement`, answering `{ status: pending | succeeded | failed, reason? }`;
+    /// a `404`, or a status this version does not know, is `pending`.
+    public func settlement(checkoutId: String, actionId: String) async throws -> BookingContract.ActionSettlement {
+        let response = try await transport.send(
+            .get, "/checkouts/\(ReplayPath.segment(checkoutId))/actions/\(ReplayPath.segment(actionId))/settlement")
+        guard response.status != 404 else { return .pending }
+        let payload = try ContractResponseDecoder.payload(SettlementPayload.self, httpStatus: response.status,
+                                                          body: response.body)
+        switch payload.status {
+        case "succeeded": return .succeeded
+        case "failed": return .failed(reason: payload.reason)
+        default: return .pending
+        }
+    }
+
+    private struct SettlementPayload: Codable, Sendable {
+        let status: String
+        let reason: String?
+    }
+
     private func send(_ method: ContractHTTPTransport.Method, _ path: String, query: [(String, String)] = [],
                       body: (any Encodable & Sendable)? = nil,
                       idempotencyKey: BookingContract.IdempotencyKey? = nil,

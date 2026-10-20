@@ -52,6 +52,11 @@ public struct BookingRecord: Sendable, Hashable, Codable, Identifiable {
     public var updatedAt: Date
     /// The contract's view of the booking, kept by the local checkout; `nil` for records made outside it.
     public var contractBooking: BookingContract.Booking?
+    /// The contract booking a payment the app cannot observe would finish, such as a Toristy hosted cart's;
+    /// it becomes `contractBooking` once the provider confirms, even after a restart.
+    public var pendingContractBooking: BookingContract.Booking?
+    /// When the host reported `contractBooking` recorded through `TRPBooking.acknowledge(bookingUuid:)`; `nil` until then.
+    public var acknowledgedAt: Date?
 
     public init(reference: BookingReference,
                 activityId: String,
@@ -64,7 +69,8 @@ public struct BookingRecord: Sendable, Hashable, Codable, Identifiable {
                 receipt: PaymentReceipt? = nil,
                 providerStatus: String? = nil,
                 createdAt: Date = Date(),
-                contractBooking: BookingContract.Booking? = nil) {
+                contractBooking: BookingContract.Booking? = nil,
+                pendingContractBooking: BookingContract.Booking? = nil) {
         self.reference = reference
         self.activityId = activityId
         self.title = title
@@ -78,7 +84,9 @@ public struct BookingRecord: Sendable, Hashable, Codable, Identifiable {
         self.createdAt = createdAt
         self.updatedAt = createdAt
         self.contractBooking = contractBooking
+        self.pendingContractBooking = pendingContractBooking
     }
+
 }
 
 /// Persists booking records.

@@ -9,6 +9,7 @@ extension BookingContract {
     public enum NextAction: Codable, Hashable, Sendable {
         case stripePaymentIntent(Payload<StripePaymentIntentParams>)
         case providerHostedForm(Payload<ProviderHostedFormParams>)
+        case providerHostedCart(Payload<ProviderHostedCartParams>)
         case braintreeDropin(Payload<BraintreeDropinParams>)
         case redirect(Payload<RedirectParams>)
         case threeDS(Payload<[String: JSONValue]>)
@@ -22,6 +23,7 @@ extension BookingContract {
             switch NextActionType(decoding: type) {
             case .stripePaymentIntent: self = .stripePaymentIntent(try Payload(from: decoder))
             case .providerHostedForm: self = .providerHostedForm(try Payload(from: decoder))
+            case .providerHostedCart: self = .providerHostedCart(try Payload(from: decoder))
             case .braintreeDropin: self = .braintreeDropin(try Payload(from: decoder))
             case .redirect: self = .redirect(try Payload(from: decoder))
             case .threeDS: self = .threeDS(try Payload(from: decoder))
@@ -33,6 +35,7 @@ extension BookingContract {
             switch self {
             case .stripePaymentIntent(let payload): try encodeTagged(payload, to: encoder)
             case .providerHostedForm(let payload): try encodeTagged(payload, to: encoder)
+            case .providerHostedCart(let payload): try encodeTagged(payload, to: encoder)
             case .braintreeDropin(let payload): try encodeTagged(payload, to: encoder)
             case .redirect(let payload): try encodeTagged(payload, to: encoder)
             case .threeDS(let payload): try encodeTagged(payload, to: encoder)
@@ -51,6 +54,7 @@ extension BookingContract {
             switch self {
             case .stripePaymentIntent: return NextActionType.stripePaymentIntent.rawValue
             case .providerHostedForm: return NextActionType.providerHostedForm.rawValue
+            case .providerHostedCart: return NextActionType.providerHostedCart.rawValue
             case .braintreeDropin: return NextActionType.braintreeDropin.rawValue
             case .redirect: return NextActionType.redirect.rawValue
             case .threeDS: return NextActionType.threeDS.rawValue
@@ -63,6 +67,7 @@ extension BookingContract {
             switch self {
             case .stripePaymentIntent(let payload): return payload.id
             case .providerHostedForm(let payload): return payload.id
+            case .providerHostedCart(let payload): return payload.id
             case .braintreeDropin(let payload): return payload.id
             case .redirect(let payload): return payload.id
             case .threeDS(let payload): return payload.id
@@ -104,6 +109,52 @@ extension BookingContract {
         public init(paymentSessionToken: String) {
             self.paymentSessionToken = paymentSessionToken
         }
+    }
+
+    /// `provider_hosted_cart` parameters: show the provider's own cart page at `url`, which carries the key it needs,
+    /// and, when `settlement` is `.poll`, ask for the action's settlement every `pollIntervalSeconds` until it settles
+    /// or `expiresAt` passes.
+    public struct ProviderHostedCartParams: Codable, Hashable, Sendable {
+        public let url: String
+        public let pollIntervalSeconds: Int
+        public let settlement: Settlement
+
+        /// How the client learns what happened on the provider's page.
+        public enum Settlement: String, Codable, Sendable {
+            /// Poll the action's settlement every `pollIntervalSeconds`.
+            case poll
+            /// Nothing is polled: the host opens the page and reports `ActionStatus.handedOff` when the user leaves it.
+            case handOff = "none"
+        }
+
+        public init(url: String, pollIntervalSeconds: Int = 3, settlement: Settlement = .poll) {
+            self.url = url
+            self.pollIntervalSeconds = pollIntervalSeconds
+            self.settlement = settlement
+        }
+
+        enum CodingKeys: String, CodingKey { case url, pollIntervalSeconds, settlement }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            url = try container.decode(String.self, forKey: .url)
+            pollIntervalSeconds = try container.decodeIfPresent(Int.self, forKey: .pollIntervalSeconds) ?? 3
+            settlement = (try? container.decodeIfPresent(Settlement.self, forKey: .settlement)) ?? .poll
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(url, forKey: .url)
+            try container.encode(pollIntervalSeconds, forKey: .pollIntervalSeconds)
+            if settlement != .poll { try container.encode(settlement, forKey: .settlement) }
+        }
+    }
+
+    /// Whether a `NextAction` the client cannot observe directly, such as a provider hosted cart, has been paid.
+    public enum ActionSettlement: Hashable, Sendable {
+        case pending
+        case succeeded
+        case failed(reason: String?)
     }
 
     /// `braintree_dropin` parameters.

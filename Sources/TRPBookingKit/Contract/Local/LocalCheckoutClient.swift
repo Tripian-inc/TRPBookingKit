@@ -79,7 +79,7 @@ public actor LocalCheckoutClient: CheckoutClient {
     public func back(checkoutId: String, fromStepId: String, lang: String,
                      idempotencyKey: BC.IdempotencyKey) async throws -> BC.CheckoutResponse {
         let session = try session(checkoutId)
-        try await run(session, allowed: .back, matches: session.flow.snapshot.step?.id == fromStepId) {
+        try await run(session, allowed: .back, matches: session.flow.snapshot.shownStepId == fromStepId) {
             try await session.flow.back()
         }
         return response(session)
@@ -104,6 +104,7 @@ public actor LocalCheckoutClient: CheckoutClient {
         let session = try session(checkoutId)
         try await run(session, allowed: .cancel, checksHold: false) {
             await session.flow.cancel()
+            guard session.flow.snapshot.status != .confirmed else { return }
             session.flow.snapshot.status = .cancelled
             session.flow.snapshot.clearHold()
             session.flow.snapshot.step = nil
@@ -114,8 +115,17 @@ public actor LocalCheckoutClient: CheckoutClient {
         return response(session)
     }
 
-    private static let unavailable = BC.ContractError(httpStatus: 503, data: BC.ErrorData(
-        code: .init(.supplierUnavailable), errors: [], retryable: true, checkout: nil))
+    public func settlement(checkoutId: String, actionId: String) async throws -> BC.ActionSettlement {
+        let session = try session(checkoutId)
+        do {
+            return try await session.flow.settlement(of: actionId)
+        } catch {
+            throw contractError(FlowRejection.from(error), session)
+        }
+    }
+
+    private static let unavailable = BC.ContractError(
+        httpStatus: 503, data: BC.ErrorData(code: .init(.supplierUnavailable), errors: [], retryable: true, checkout: nil))
 
     private func checkVersion() throws {
         guard contractVersion != BC.version else { return }
@@ -150,6 +160,7 @@ public actor LocalCheckoutClient: CheckoutClient {
         let snapshot = session.flow.snapshot
         guard !snapshot.isFinished, let deadline = snapshot.holdExpiresAt, deadline <= now() else { return false }
         await session.flow.expire()
+        guard session.flow.snapshot.status != .confirmed else { return false }
         let minutes = Int(((deadline.timeIntervalSince(snapshot.holdPlacedAt ?? deadline)) / 60).rounded())
         session.flow.snapshot.status = .expired
         session.flow.snapshot.clearHold()

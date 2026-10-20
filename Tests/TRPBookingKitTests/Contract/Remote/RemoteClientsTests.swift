@@ -162,6 +162,35 @@ final class RemoteClientsTests: XCTestCase {
         }
     }
 
+    func testSettlementMapsSucceededFailedAndPendingStatuses() async throws {
+        let checkout = RemoteCheckoutClient(baseURL: baseURL, session: StubURLProtocol.session,
+                                            decorator: StaticContractHeaders([:]), capabilities: { "" })
+
+        StubURLProtocol.answer([BC.RecordedResponse(status: 200, body: .object(["status": .number(200), "success": .bool(true),
+                                                                                "data": .object(["status": .string("succeeded")])]))])
+        var settlement = try await checkout.settlement(checkoutId: "chk_01J9ZQ4M8K", actionId: "act_01J9ZTB4")
+        XCTAssertEqual(settlement, .succeeded)
+
+        StubURLProtocol.answer([BC.RecordedResponse(status: 200, body: .object(["status": .number(200), "success": .bool(true),
+                                                                                "data": .object(["status": .string("failed"),
+                                                                                                 "reason": .string("The cart was cancelled.")])]))])
+        settlement = try await checkout.settlement(checkoutId: "chk_01J9ZQ4M8K", actionId: "act_01J9ZTB4")
+        XCTAssertEqual(settlement, .failed(reason: "The cart was cancelled."))
+
+        StubURLProtocol.answer([BC.RecordedResponse(status: 200, body: .object(["status": .number(200), "success": .bool(true),
+                                                                                "data": .object(["status": .string("pending")])]))])
+        settlement = try await checkout.settlement(checkoutId: "chk_01J9ZQ4M8K", actionId: "act_01J9ZTB4")
+        XCTAssertEqual(settlement, .pending)
+    }
+
+    func testSettlementOfAnUnknownActionIsPending() async throws {
+        let checkout = RemoteCheckoutClient(baseURL: baseURL, session: StubURLProtocol.session,
+                                            decorator: StaticContractHeaders([:]), capabilities: { "" })
+        StubURLProtocol.answer([BC.RecordedResponse(status: 404, body: .object([:]))])
+        let settlement = try await checkout.settlement(checkoutId: "chk_01J9ZQ4M8K", actionId: "act_01J9ZTB4")
+        XCTAssertEqual(settlement, .pending)
+    }
+
     func testNonJSONBodyIsUndecodable() async throws {
         StubURLProtocol.answer([BC.RecordedResponse(status: 502, headers: ["Content-Type": "text/html"],
                                                     body: .string("<html>Bad gateway</html>"))])
