@@ -166,6 +166,57 @@ final class ToristyCheckoutTests: XCTestCase {
         XCTAssertEqual(record?.receipt, confirmed.receipt)
     }
 
+    func testPayPassesTheHoldsTotalCurrencyAndReferenceToConfirm() async throws {
+        let service = MockToristyBookingService()
+        service.confirmResult = .success(())
+        let payment = MockPaymentProcessing()
+        payment.chargeResult = .success(makeReceipt())
+        let store = InMemoryBookingRecordStore()
+        let hold = makeHold(total: Decimal(string: "30.53")!, currency: "EUR")
+        await saveHeldRecord(hold, store: store)
+        let checkout = makeCheckout(service: service, payment: payment, store: store, now: { self.referenceDate })
+
+        _ = try await checkout.pay(hold, customerEmail: nil)
+
+        XCTAssertEqual(service.confirmedReferences, [hold.reference])
+        XCTAssertEqual(service.confirmedAmounts, [Decimal(string: "30.53")!])
+        XCTAssertEqual(service.confirmedCurrencies, ["EUR"])
+    }
+
+    func testPayNeverCallsConfirmWhenTheChargeFails() async throws {
+        let service = MockToristyBookingService()
+        let payment = MockPaymentProcessing()
+        payment.chargeResult = .failure(BookingError.paymentFailed("Card declined"))
+        let store = InMemoryBookingRecordStore()
+        let hold = makeHold()
+        await saveHeldRecord(hold, store: store)
+        let checkout = makeCheckout(service: service, payment: payment, store: store, now: { self.referenceDate })
+
+        do {
+            _ = try await checkout.pay(hold, customerEmail: nil)
+            XCTFail("Expected an error")
+        } catch BookingError.paymentFailed {
+        }
+        XCTAssertEqual(service.confirmCallCount, 0)
+    }
+
+    func testPayNeverCallsConfirmWhenThePaymentIsCancelled() async throws {
+        let service = MockToristyBookingService()
+        let payment = MockPaymentProcessing()
+        payment.chargeResult = .failure(BookingError.paymentCancelled)
+        let store = InMemoryBookingRecordStore()
+        let hold = makeHold()
+        await saveHeldRecord(hold, store: store)
+        let checkout = makeCheckout(service: service, payment: payment, store: store, now: { self.referenceDate })
+
+        do {
+            _ = try await checkout.pay(hold, customerEmail: nil)
+            XCTFail("Expected an error")
+        } catch BookingError.paymentCancelled {
+        }
+        XCTAssertEqual(service.confirmCallCount, 0)
+    }
+
     func testPayRecoversViaBookingDataWhenTheConfirmCallFailsButBookingDataShowsConfirmed() async throws {
         let service = MockToristyBookingService()
         service.confirmResult = .failure(BookingError.transport("dropped"))
@@ -390,6 +441,25 @@ final class ToristyCheckoutTests: XCTestCase {
         XCTAssertEqual(service.confirmCallCount, 1)
     }
 
+    func testResolveUnfinishedPassesTheRecordsTotalAndCurrencyToConfirm() async throws {
+        let service = MockToristyBookingService()
+        service.bookingDataResult = .failure(BookingError.transport("no status"))
+        service.confirmResult = .success(())
+        let store = InMemoryBookingRecordStore()
+        let reference = makeReference()
+        await store.save(BookingRecord(reference: reference, activityId: "a1", title: "t", travelDate: nil, status: .charged,
+                                        total: Decimal(string: "30.53")!, currency: "EUR",
+                                        deadline: BookingDeadline(expiresAt: referenceDate.addingTimeInterval(600)),
+                                        receipt: makeReceipt(), createdAt: referenceDate))
+        let checkout = makeCheckout(service: service, payment: MockPaymentProcessing(), store: store, now: { self.referenceDate })
+
+        _ = await checkout.resolveUnfinished()
+
+        XCTAssertEqual(service.confirmedReferences, [reference])
+        XCTAssertEqual(service.confirmedAmounts, [Decimal(string: "30.53")!])
+        XCTAssertEqual(service.confirmedCurrencies, ["EUR"])
+    }
+
     func testResolveUnfinishedRefundsAChargedRecordPastItsDeadline() async throws {
         let service = MockToristyBookingService()
         service.bookingDataResult = .failure(BookingError.transport("no status"))
@@ -424,6 +494,33 @@ final class ToristyCheckoutTests: XCTestCase {
         XCTAssertEqual(unfinished?.status, .refunded)
         XCTAssertEqual(service.confirmCallCount, 0)
         XCTAssertEqual(payment.refundCallCount, 1)
+    }
+
+    func testResolveUnfinishedLeavesACartWhosePayIsStillRunningToIt() async throws {
+        let service = MockToristyBookingService()
+        service.bookingDataResult = .failure(BookingError.transport("no status"))
+        let confirming = SuspendedCall()
+        service.confirmSuspension = confirming
+        let payment = MockPaymentProcessing()
+        payment.chargeResult = .success(makeReceipt())
+        let store = InMemoryBookingRecordStore()
+        let hold = makeHold()
+        await saveHeldRecord(hold, store: store)
+        let checkout = makeCheckout(service: service, payment: payment, store: store, now: { self.referenceDate })
+        let paying = Task { try await checkout.pay(hold, customerEmail: nil) }
+        await confirming.waitUntilEntered()
+
+        _ = await checkout.resolveUnfinished()
+
+        XCTAssertEqual(service.bookingDataCallCount, 0)
+        XCTAssertEqual(service.confirmCallCount, 1)
+        XCTAssertEqual(payment.refundCallCount, 0)
+        let duringPay = await store.record(for: hold.reference)
+        XCTAssertEqual(duringPay?.status, .charged)
+        confirming.resume()
+        _ = try await paying.value
+        let afterPay = await store.record(for: hold.reference)
+        XCTAssertEqual(afterPay?.status, .confirmed)
     }
 
     func testResolveUnfinishedOnlyProcessesToristyRecords() async throws {

@@ -104,7 +104,7 @@ private struct AnyEncodable: Encodable {
     func encode(to encoder: Encoder) throws { try value.encode(to: encoder) }
 }
 
-/// Sends a fixed header with every request, the way Toristy and Viator take their keys.
+/// Sends a fixed header with every request, the way Viator takes its key.
 public struct HeaderKeyAuthorizer: RequestAuthorizing {
 
     public let headerName: String
@@ -117,5 +117,37 @@ public struct HeaderKeyAuthorizer: RequestAuthorizing {
 
     public func authorize(_ request: inout URLRequest) throws {
         request.setValue(value, forHTTPHeaderField: headerName)
+    }
+}
+
+/// Appends a fixed query parameter to every request's url, keeping the query items already there; Toristy takes its
+/// key this way and rejects it in a header.
+public struct QueryKeyAuthorizer: RequestAuthorizing {
+
+    public let parameterName: String
+    private let value: String
+
+    public init(parameterName: String, value: String) {
+        self.parameterName = parameterName
+        self.value = value
+    }
+
+    public func authorize(_ request: inout URLRequest) throws {
+        guard let url = request.url, var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+            throw BookingError.transport("Invalid url \(request.url?.absoluteString ?? "")")
+        }
+        var items = (components.percentEncodedQueryItems ?? []).filter { $0.name != Self.encode(parameterName) }
+        items.append(URLQueryItem(name: Self.encode(parameterName), value: Self.encode(value)))
+        components.percentEncodedQueryItems = items
+        guard let authorized = components.url else {
+            throw BookingError.transport("Invalid url \(url.absoluteString)")
+        }
+        request.url = authorized
+    }
+
+    private static let unreserved = CharacterSet(charactersIn: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~")
+
+    private static func encode(_ string: String) -> String {
+        string.addingPercentEncoding(withAllowedCharacters: unreserved) ?? string
     }
 }

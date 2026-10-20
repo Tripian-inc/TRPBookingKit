@@ -17,7 +17,19 @@ final class MockToristyBookingService: ToristyBookingService, @unchecked Sendabl
     var cancelCallCount = 0
 
     var confirmHandler: (() -> Result<Void, Error>)?
+    var cancelHandler: (() async -> Void)?
     var bookingDataHandler: (() -> Result<ToristyBookingData, Error>)?
+    /// Holds the next `confirm` call open until resumed; later calls run straight through.
+    var confirmSuspension: SuspendedCall?
+    /// Holds the next `bookingData` call open until resumed; later calls run straight through.
+    var bookingDataSuspension: SuspendedCall?
+
+    private(set) var confirmedReferences: [BookingReference] = []
+    private(set) var confirmedAmounts: [Decimal] = []
+    private(set) var confirmedCurrencies: [String] = []
+    private(set) var cancelledReferences: [BookingReference] = []
+    private(set) var cancelledNotes: [String?] = []
+    private(set) var cancelledNotifyValues: [Bool] = []
 
     func bookingInformation(serviceId: Int, currency: String?) async throws -> ToristyBookingInformation {
         bookingInformationCallCount += 1
@@ -36,6 +48,13 @@ final class MockToristyBookingService: ToristyBookingService, @unchecked Sendabl
 
     func confirm(_ reference: BookingReference, receipt: PaymentReceipt, amount: Decimal, currency: String) async throws {
         confirmCallCount += 1
+        confirmedReferences.append(reference)
+        confirmedAmounts.append(amount)
+        confirmedCurrencies.append(currency)
+        if let suspension = confirmSuspension {
+            confirmSuspension = nil
+            await suspension.suspend()
+        }
         if let confirmHandler {
             try confirmHandler().get()
             return
@@ -45,6 +64,10 @@ final class MockToristyBookingService: ToristyBookingService, @unchecked Sendabl
 
     func bookingData(cartId: String) async throws -> ToristyBookingData {
         bookingDataCallCount += 1
+        if let suspension = bookingDataSuspension {
+            bookingDataSuspension = nil
+            await suspension.suspend()
+        }
         if let bookingDataHandler {
             return try bookingDataHandler().get()
         }
@@ -53,6 +76,10 @@ final class MockToristyBookingService: ToristyBookingService, @unchecked Sendabl
 
     func cancel(_ reference: BookingReference, note: String?, notify: Bool) async throws -> ToristyCancellation {
         cancelCallCount += 1
+        cancelledReferences.append(reference)
+        cancelledNotes.append(note)
+        cancelledNotifyValues.append(notify)
+        await cancelHandler?()
         return try unwrap(cancelResult)
     }
 

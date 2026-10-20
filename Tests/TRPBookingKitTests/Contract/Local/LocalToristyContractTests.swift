@@ -68,7 +68,170 @@ final class LocalToristyContractTests: XCTestCase {
         try await assertLocalSnapshot("toristy/errors", "HOLD_EXPIRED", checkout: checkout, bookings: bookings)
     }
 
-    private static let information = ToristyBookingInformation(
+    func testCanceledPaymentLeavesCheckoutUnchanged() async throws {
+        try await replay(Self.flow[0..<7])
+        let recordsBefore = await store.all().map(\.status)
+        let response = try await checkout.action(checkoutId: "chk_01J9ZT7P2N", actionId: "act_01J9ZTB4",
+                                                 result: BookingContract.ActionResult(status: .init(.canceled)), lang: "en")
+        XCTAssertEqual(response.checkout.status.value, .awaitingPayment)
+        XCTAssertEqual(response.checkout.nextAction?.id, "act_01J9ZTB4")
+        XCTAssertEqual(response.checkout.allowedActions.map(\.value), [.back, .cancel])
+        XCTAssertEqual(stripe.intentCallCount, 1)
+        XCTAssertEqual(stripe.chargeCallCount, 0)
+        XCTAssertEqual(service.confirmCallCount, 0)
+        let recordsAfter = await store.all().map(\.status)
+        XCTAssertEqual(recordsAfter, recordsBefore)
+    }
+
+    func testBackFromAwaitingPaymentShowsSummaryAndKeepsHold() async throws {
+        try await replay(Self.flow[0..<7])
+        let validations = service.validateCallCount
+        let back = try await checkout.back(checkoutId: "chk_01J9ZT7P2N", fromStepId: "summary", lang: "en")
+        XCTAssertEqual(back.checkout.status.value, .collectingDetails)
+        XCTAssertEqual(back.checkout.currentStep?.id, "summary")
+        XCTAssertNil(back.checkout.nextAction)
+        XCTAssertTrue(back.checkout.allowedActions.contains { $0.value == .submit })
+        let resubmitted = try await checkout.submit(checkoutId: "chk_01J9ZT7P2N", stepId: "summary", answers: [:], lang: "en")
+        XCTAssertEqual(resubmitted.checkout.status.value, .awaitingPayment)
+        XCTAssertNotNil(resubmitted.checkout.nextAction)
+        XCTAssertEqual(service.validateCallCount, validations)
+        XCTAssertEqual(stripe.chargeCallCount, 0)
+    }
+
+    func testDeclinedPaymentActionNeverCallsConfirm() async throws {
+        try await replay(Self.flow[0..<7])
+        do {
+            _ = try await checkout.action(checkoutId: "chk_01J9ZT7P2N", actionId: "act_01J9ZTB4",
+                                          result: BookingContract.ActionResult(status: .init(rawValue: "failed")), lang: "en")
+            XCTFail("Expected a payment decline")
+        } catch let error as BookingContract.ContractError {
+            XCTAssertEqual(error.data.code.value, .paymentDeclined)
+        }
+        XCTAssertEqual(service.confirmCallCount, 0)
+    }
+
+    func testCancelOfAHeldUnconfirmedCartReleasesItAtToristyWithoutNotifying() async throws {
+        try await replay(Self.flow[0..<7])
+        service.cancelResult = .success(ToristyCancellation(message: "never confirmed", confirmationCode: "TRS-20261015-48213"))
+        let response = try await checkout.cancel(checkoutId: "chk_01J9ZT7P2N", lang: "en")
+        XCTAssertEqual(response.checkout.status.value, .cancelled)
+        XCTAssertEqual(service.cancelledReferences.map(\.primary), ["cart-48213"])
+        XCTAssertEqual(service.cancelledNotes, ["Checkout cancelled before payment."])
+        XCTAssertEqual(service.cancelledNotifyValues, [false])
+        let status = await recordStatus("cart-48213")
+        XCTAssertEqual(status, .cancelled)
+    }
+
+    func testCancelStillCancelsTheCheckoutWhenToristyRefusesTheRelease() async throws {
+        try await replay(Self.flow[0..<7])
+        service.cancelResult = .failure(BookingError.server(status: 500, code: nil, message: "unavailable"))
+        let response = try await checkout.cancel(checkoutId: "chk_01J9ZT7P2N", lang: "en")
+        XCTAssertEqual(response.checkout.status.value, .cancelled)
+        XCTAssertEqual(service.cancelCallCount, 1)
+        XCTAssertEqual(service.cancelledNotifyValues, [false])
+        let status = await recordStatus("cart-48213")
+        XCTAssertEqual(status, .cancelled)
+    }
+
+    func testAPaymentResultArrivingWhileTheReleaseIsInFlightCannotConfirmTheCart() async throws {
+        try await replay(Self.flow[0..<7])
+        let release = SuspendedCall()
+        service.cancelHandler = { await release.suspend() }
+        service.cancelResult = .success(ToristyCancellation(message: "never confirmed", confirmationCode: "TRS-20261015-48213"))
+        let client: LocalCheckoutClient = checkout
+        let cancelling = Task { try await client.cancel(checkoutId: "chk_01J9ZT7P2N", lang: "en") }
+        await release.waitUntilEntered()
+        do {
+            _ = try await client.action(checkoutId: "chk_01J9ZT7P2N", actionId: "act_01J9ZTB4",
+                                        result: BookingContract.ActionResult(status: .init(.succeeded)), lang: "en")
+            XCTFail("Expected STEP_MISMATCH")
+        } catch let error as BookingContract.ContractError {
+            XCTAssertEqual(error.data.code.value, .stepMismatch)
+        }
+        release.resume()
+        let response = try await cancelling.value
+        XCTAssertEqual(response.checkout.status.value, .cancelled)
+        XCTAssertEqual(stripe.chargeCallCount, 0)
+        XCTAssertEqual(service.confirmCallCount, 0)
+        let status = await recordStatus("cart-48213")
+        XCTAssertEqual(status, .cancelled)
+    }
+
+    func testChangingTheSelectionReleasesThePreviousCartWithoutNotifying() async throws {
+        try await replay(Self.flow[0..<7])
+        service.cancelResult = .success(ToristyCancellation(message: "never confirmed", confirmationCode: "TRS-20261015-48213"))
+        service.validateResult = .success(ToristyValidation(cartId: "cart-48214", confirmationCode: "TRS-20261015-48214",
+                                                            totalPrice: Decimal(string: "62.50")!, currency: "EUR"))
+        _ = try await checkout.back(checkoutId: "chk_01J9ZT7P2N", fromStepId: "summary", lang: "en")
+        let details = try await checkout.back(checkoutId: "chk_01J9ZT7P2N", fromStepId: "summary", lang: "en")
+        XCTAssertEqual(details.checkout.currentStep?.id, "details")
+        var answers = Self.detailsAnswers
+        answers["lead.firstName"] = "Ayşe"
+        _ = try await checkout.submit(checkoutId: "chk_01J9ZT7P2N", stepId: "details", answers: answers, lang: "en")
+        XCTAssertEqual(service.validateCallCount, 2)
+        XCTAssertEqual(service.cancelledReferences.map(\.primary), ["cart-48213"])
+        XCTAssertEqual(service.cancelledNotes, ["Selection changed before payment."])
+        XCTAssertEqual(service.cancelledNotifyValues, [false])
+        let replaced = await recordStatus("cart-48213")
+        XCTAssertEqual(replaced, .cancelled)
+        let current = await recordStatus("cart-48214")
+        XCTAssertEqual(current, .held)
+    }
+
+    func testResubmittingAnUnchangedSelectionKeepsTheCartAndReleasesNothing() async throws {
+        try await replay(Self.flow[0..<7])
+        _ = try await checkout.back(checkoutId: "chk_01J9ZT7P2N", fromStepId: "summary", lang: "en")
+        _ = try await checkout.back(checkoutId: "chk_01J9ZT7P2N", fromStepId: "summary", lang: "en")
+        _ = try await checkout.submit(checkoutId: "chk_01J9ZT7P2N", stepId: "details", answers: Self.detailsAnswers, lang: "en")
+        XCTAssertEqual(service.validateCallCount, 1)
+        XCTAssertEqual(service.cancelCallCount, 0)
+    }
+
+    func testADeclinedChargeKeepsTheCartForAnotherCard() async throws {
+        try await replay(Self.flow[0..<7])
+        stripe.chargeResult = .failure(BookingError.paymentFailed("Card declined"))
+        do {
+            _ = try await checkout.action(checkoutId: "chk_01J9ZT7P2N", actionId: "act_01J9ZTB4",
+                                          result: BookingContract.ActionResult(status: .init(.succeeded)), lang: "en")
+            XCTFail("Expected a payment decline")
+        } catch let error as BookingContract.ContractError {
+            XCTAssertEqual(error.data.code.value, .paymentDeclined)
+        }
+        let current = try await checkout.get(id: "chk_01J9ZT7P2N", lang: "en")
+        XCTAssertEqual(current.checkout.status.value, .awaitingPayment)
+        XCTAssertNotNil(current.checkout.nextAction)
+        XCTAssertEqual(service.cancelCallCount, 0)
+        XCTAssertEqual(service.confirmCallCount, 0)
+        let status = await recordStatus("cart-48213")
+        XCTAssertEqual(status, .held)
+    }
+
+    func testCancelBeforeAnyHoldIsPlacedDoesNotCallToristyCancel() async throws {
+        try await replay(Self.flow[0..<5])
+        _ = try await checkout.cancel(checkoutId: "chk_01J9ZT7P2N", lang: "en")
+        XCTAssertEqual(service.cancelCallCount, 0)
+    }
+
+    func testBackFromAwaitingPaymentRejectsOtherStep() async throws {
+        try await replay(Self.flow[0..<7])
+        do {
+            _ = try await checkout.back(checkoutId: "chk_01J9ZT7P2N", fromStepId: "details", lang: "en")
+            XCTFail("Expected STEP_MISMATCH")
+        } catch let error as BookingContract.ContractError {
+            XCTAssertEqual(error.data.code.value, .stepMismatch)
+        }
+    }
+
+    private func recordStatus(_ cartId: String) async -> BookingRecordStatus? {
+        await store.all().first { $0.reference.primary == cartId }?.status
+    }
+
+    private static let detailsAnswers: BookingContract.Answers = [
+        "lead.firstName": "Elif", "lead.lastName": "Demir", "lead.email": "elif@example.com", "lead.phone": "+905551112233",
+        "t1.fullName": "Elif Demir", "t2.fullName": "Can Demir", "t3.fullName": "Deniz Demir", "t3.birthDate": "2017-05-09"
+    ]
+
+    static let information = ToristyBookingInformation(
         serviceId: 48213, currency: "EUR", startingPrice: 25, lowestPrice: 25, fields: ToristyBookingFields(),
         rates: [
             ToristyRate(id: "RATE_STD", name: "Standard group", startingPrice: 25, prices: [
@@ -82,7 +245,7 @@ final class LocalToristyContractTests: XCTestCase {
         cancellationPolicy: nil, cancellationRules: [ToristyCancellationRule(feePercentage: 100, cutoffHours: 24)],
         pickupPoints: [], dropoffPoints: [])
 
-    private static let availability = ToristyAvailability(serviceId: 48213, days: [
+    static let availability = ToristyAvailability(serviceId: 48213, days: [
         ToristyAvailabilityDay(date: BookingDate("2026-10-15")!, times: [
             ToristyStartTime(time: "10:00", id: 1, availableCount: 12),
             ToristyStartTime(time: "15:30", id: 2, availableCount: 3)
@@ -117,9 +280,11 @@ final class MockStripePaymentIntents: StripePaymentIntentProviding, @unchecked S
         chargeId: "pi_3QAbCdEf12345678", amount: Decimal(string: "62.50")!, currency: "EUR", cardBrand: "visa", last4: "4242",
         paidAt: Date(timeIntervalSince1970: 0)))
     var lastIntentRequest: PaymentRequest?
+    var intentCallCount = 0
     var chargeCallCount = 0
 
     func paymentIntent(for request: PaymentRequest) async throws -> StripePaymentIntent {
+        intentCallCount += 1
         lastIntentRequest = request
         return try intentResult.get()
     }

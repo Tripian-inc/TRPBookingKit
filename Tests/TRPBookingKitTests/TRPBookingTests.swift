@@ -113,13 +113,14 @@ final class TRPBookingTests: XCTestCase {
 
     // MARK: - isAvailable / checkout wiring
 
-    func testToristyCheckoutIsBuiltOnlyWhenBothCredentialsAndPaymentAreSupplied() {
+    func testToristyCheckoutIsBuiltWheneverCredentialsArePresent() {
         let withCredentialsOnly = TRPBooking(
             configuration: BookingConfiguration(registry: registry, toristy: makeToristy()),
             store: InMemoryBookingRecordStore()
         )
-        XCTAssertNil(withCredentialsOnly.toristy)
-        XCTAssertFalse(withCredentialsOnly.isAvailable(.toristy))
+        XCTAssertNotNil(withCredentialsOnly.toristy)
+        XCTAssertNotNil(withCredentialsOnly.toristy?.hostedCart)
+        XCTAssertTrue(withCredentialsOnly.isAvailable(.toristy))
 
         let withPaymentOnly = TRPBooking(
             configuration: BookingConfiguration(registry: registry),

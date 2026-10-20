@@ -24,19 +24,29 @@ public struct ToristyConfirmedBooking: Sendable, Hashable {
 /// The cart references are saved before the charge, and a charge that the provider does not
 /// confirm is refunded through the same `PaymentProcessing`; when that refund fails too the
 /// record stays `.needsRefund` for `resolveUnfinished()` or support.
+/// Without a `PaymentProcessing` the customer pays on `hostedCart` instead, and `pay` is unavailable.
 public actor ToristyCheckout {
 
     /// How long a cart lives when `bookingdata` does not say.
     public static let defaultCartLifetime: TimeInterval = 30 * 60
 
+    /// How long past its deadline a hosted cart the checkout released is still asked about, since a payment already
+    /// underway on Toristy's page can confirm it after the release.
+    public static let releasedCartRecheckWindow: TimeInterval = 15 * 60
+
+    /// The page the customer pays a reserved cart on, when the host pays through Toristy's hosted cart.
+    public nonisolated let hostedCart: ToristyHostedCart?
+
     private let service: ToristyBookingService
-    private let payment: PaymentProcessing
+    private let payment: PaymentProcessing?
     private let store: BookingRecordStore
     private let backgroundTasks: BackgroundTaskRunning
     private let validator: ToristySelectionValidator
     private let confirmationAttempts: Int
     private let retryDelay: TimeInterval
     private let now: @Sendable () -> Date
+    private var paying: Set<BookingReference> = []
+    private var resolving: Task<[BookingRecord], Never>?
 
     public init(service: ToristyBookingService,
                 payment: PaymentProcessing,
@@ -46,6 +56,23 @@ public actor ToristyCheckout {
                 confirmationAttempts: Int = 3,
                 retryDelay: TimeInterval = 2,
                 now: @escaping @Sendable () -> Date = { Date() }) {
+        self.init(service: service, hostedCart: nil, payment: payment, store: store, backgroundTasks: backgroundTasks,
+                  validator: validator, confirmationAttempts: confirmationAttempts, retryDelay: retryDelay, now: now)
+    }
+
+    /// - Parameters:
+    ///   - hostedCart: the page the customer pays on when there is no `payment`.
+    ///   - payment: charges the customer and refunds a charge Toristy does not confirm; `nil` leaves payment to `hostedCart`.
+    public init(service: ToristyBookingService,
+                hostedCart: ToristyHostedCart?,
+                payment: PaymentProcessing? = nil,
+                store: BookingRecordStore,
+                backgroundTasks: BackgroundTaskRunning = BookingConfiguration.defaultBackgroundTaskRunner,
+                validator: ToristySelectionValidator = ToristySelectionValidator(),
+                confirmationAttempts: Int = 3,
+                retryDelay: TimeInterval = 2,
+                now: @escaping @Sendable () -> Date = { Date() }) {
+        self.hostedCart = hostedCart
         self.service = service
         self.payment = payment
         self.store = store
@@ -93,9 +120,13 @@ public actor ToristyCheckout {
 
     /// Charges the customer and confirms the cart.
     ///
-    /// Throws `.holdExpired` before charging a cart past its deadline, and
-    /// `.confirmationFailedAfterCharge` when the money was taken but the booking not confirmed.
+    /// Throws `.holdExpired` before charging a cart past its deadline,
+    /// `.confirmationFailedAfterCharge` when the money was taken but the booking not confirmed, and
+    /// `.providerNotConfigured` when there is no `PaymentProcessing` to charge with.
     public func pay(_ hold: ToristyHold, customerEmail: String?) async throws -> ToristyConfirmedBooking {
+        guard let payment else { throw BookingError.providerNotConfigured(.toristy) }
+        paying.insert(hold.reference)
+        defer { paying.remove(hold.reference) }
         guard !hold.deadline.isExpired(at: now()) else {
             await store.update(hold.reference) { $0.status = .expired }
             throw BookingError.holdExpired
@@ -138,11 +169,27 @@ public actor ToristyCheckout {
         return result
     }
 
-    /// Retries confirmation or the refund of records a previous run left charged but unconfirmed.
+    /// Retries confirmation or the refund of records a previous run left charged but unconfirmed, and settles carts
+    /// held without a charge by their status alone: a confirmed cart finishes its booking, while a cancelled, timed out
+    /// or lapsed one is cleared. A hosted cart the checkout released is asked about until `releasedCartRecheckWindow`
+    /// past its deadline and finishes its booking if Toristy confirmed it after all; otherwise it stays cleared.
+    ///
+    /// A cart whose `pay` is still running is left to it, and a call made while another runs waits for that one.
     public func resolveUnfinished() async -> [BookingRecord] {
+        if let resolving { return await resolving.value }
+        let run = Task { await self.settleUnfinished() }
+        resolving = run
+        let records = await run.value
+        resolving = nil
+        return records
+    }
+
+    private func settleUnfinished() async -> [BookingRecord] {
         for record in await store.unresolved() where record.reference.provider == .toristy {
-            guard let receipt = record.receipt else { continue }
-            if let data = try? await service.bookingData(cartId: record.reference.primary), data.status == .confirmed {
+            guard let receipt = record.receipt, !paying.contains(record.reference) else { continue }
+            let data = try? await service.bookingData(cartId: record.reference.primary)
+            guard !paying.contains(record.reference) else { continue }
+            if let data, data.status == .confirmed {
                 await store.update(record.reference) {
                     $0.status = .confirmed
                     $0.providerStatus = "Confirmed"
@@ -158,9 +205,64 @@ public actor ToristyCheckout {
                 }
                 continue
             }
+            guard !paying.contains(record.reference) else { continue }
             await refund(record.reference, receipt: receipt, reason: "Toristy did not confirm the booking.")
         }
+        for record in await store.all()
+        where record.reference.provider == .toristy && record.receipt == nil && !paying.contains(record.reference)
+            && (record.status == .held || (record.status == .confirmed && record.contractBooking == nil && record.pendingContractBooking != nil)) {
+            await settleUncharged(record)
+        }
+        for record in await store.all() where isRecheckableRelease(record) && !paying.contains(record.reference) {
+            await finishIfConfirmed(record)
+        }
         return await store.all().filter { $0.reference.provider == .toristy }
+    }
+
+    private func isRecheckableRelease(_ record: BookingRecord) -> Bool {
+        guard record.reference.provider == .toristy, record.receipt == nil, record.status == .cancelled,
+              record.contractBooking == nil, record.pendingContractBooking != nil, let deadline = record.deadline else { return false }
+        return now() < deadline.expiresAt.addingTimeInterval(Self.releasedCartRecheckWindow)
+    }
+
+    private func finishIfConfirmed(_ record: BookingRecord) async {
+        guard let data = try? await service.bookingData(cartId: record.reference.primary), data.status == .confirmed else { return }
+        await finishConfirmed(record.reference, confirmationCode: data.confirmationCode)
+    }
+
+    private func finishConfirmed(_ reference: BookingReference, confirmationCode: String?) async {
+        await store.update(reference) {
+            $0.status = .confirmed
+            $0.providerStatus = "Confirmed"
+            if let pending = $0.pendingContractBooking {
+                $0.contractBooking = pending.with(providerReference: confirmationCode ?? pending.providerReference)
+                $0.pendingContractBooking = nil
+            }
+        }
+    }
+
+    private func settleUncharged(_ record: BookingRecord) async {
+        guard let data = try? await service.bookingData(cartId: record.reference.primary),
+              !paying.contains(record.reference) else { return }
+        let lapsed = (data.deadline ?? record.deadline)?.isExpired(at: now()) ?? false
+        switch data.status {
+        case .confirmed:
+            await finishConfirmed(record.reference, confirmationCode: data.confirmationCode)
+        case .cancelled:
+            await store.update(record.reference) {
+                $0.status = .cancelled
+                $0.providerStatus = "Cancelled"
+            }
+        case .timedOut:
+            await store.update(record.reference) {
+                $0.status = .expired
+                $0.providerStatus = "Timed Out"
+            }
+        case .reserved where lapsed:
+            await store.update(record.reference) { $0.status = .expired }
+        default:
+            return
+        }
     }
 
     private func confirm(_ hold: ToristyHold, receipt: PaymentReceipt) async throws -> ToristyConfirmedBooking {
@@ -201,6 +303,10 @@ public actor ToristyCheckout {
     }
 
     private func refund(_ reference: BookingReference, receipt: PaymentReceipt, reason: String) async {
+        guard let payment else {
+            await store.update(reference) { $0.status = .needsRefund }
+            return
+        }
         do {
             try await payment.refund(receipt, reason: reason)
             await store.update(reference) { $0.status = .refunded }

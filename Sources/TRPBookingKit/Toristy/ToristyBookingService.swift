@@ -20,6 +20,14 @@ public struct ToristyAPIClient: ToristyBookingService {
     public static let maximumAvailabilityDays = 62
     /// `endDate` must fall within a year of today.
     public static let maximumAvailabilityHorizonDays = 364
+    /// `lang` values the hosted cart page serves; anything else falls back to English.
+    public static let hostedCartLanguages: Set<String> = ["en", "de", "es", "fr", "it", "pt"]
+
+    /// Maps an app language such as `tr-TR` or `de-DE` onto the hosted cart page's `lang` values.
+    public static func hostedCartLanguage(for languageCode: String) -> String {
+        let base = languageCode.lowercased().split(whereSeparator: { $0 == "-" || $0 == "_" }).first.map(String.init) ?? "en"
+        return hostedCartLanguages.contains(base) ? base : "en"
+    }
 
     private let client: ProviderHTTPClient
 
@@ -27,7 +35,7 @@ public struct ToristyAPIClient: ToristyBookingService {
         client = ProviderHTTPClient(
             baseURL: credentials.baseURL,
             transport: transport,
-            authorizer: HeaderKeyAuthorizer(headerName: "X-Api-Key", value: credentials.apiKey),
+            authorizer: QueryKeyAuthorizer(parameterName: "apikey", value: credentials.apiKey),
             errorParser: ToristyAPIClient.parseError
         )
     }

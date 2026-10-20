@@ -37,6 +37,7 @@
         "expiresAt": "2026-10-02T09:42:00Z"
       },
       "allowedActions": [
+        "back",
         "cancel"
       ],
       "booking": {
