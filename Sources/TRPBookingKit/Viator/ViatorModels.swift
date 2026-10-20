@@ -146,6 +146,16 @@ public struct ViatorLanguageGuide: Sendable, Hashable, Codable {
         self.language = language
         self.legacyGuide = legacyGuide
     }
+
+    /// The guide to book from `guides`: the first one in the app's language, otherwise the first offered.
+    /// Viator refuses `cart/book` without one whenever the option offers any.
+    public static func preferred(from guides: [ViatorLanguageGuide], languageCode: String) -> ViatorLanguageGuide? {
+        let wanted = ViatorAPIClient.acceptLanguage(for: languageCode).lowercased()
+        let base = wanted.split(separator: "-").first.map(String.init) ?? wanted
+        return guides.first { $0.language.lowercased() == wanted }
+            ?? guides.first { $0.language.lowercased().hasPrefix(base) }
+            ?? guides.first
+    }
 }
 
 /// `GET /availability/schedules/{productCode}`, for the date picker only.

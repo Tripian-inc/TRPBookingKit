@@ -1,83 +1,66 @@
 <!doctype html>
 <!--
-  Reference page for Viator's VIATOR_FORM payment step, served from the origin sent as `hostingUrl`
-  (ViatorCredentials.paymentPageURL). ViatorPaymentWebSession loads it and then calls
-  window.trpViatorPayment.start({sessionToken, language}); the page answers through
-  window.webkit.messageHandlers.viatorPayment (iOS) or window.AndroidViator (Android).
-  A rejected card stays on the page so the customer can retry; `error` is posted only when the form cannot start.
+  Hosted payment page for Viator's VIATOR_FORM payment flow.
 
-  TO VERIFY against Viator's partner technical guide before going live:
-  - the global and constructor payment.js exposes (written here as `Payment`) and its options;
-  - the submit call (written here as `submitForm`) and the callback names onSubmitSuccess / onSubmitError;
-  - the device fingerprint step, if the library does not run it on its own;
-  - the exact CSP hosts Viator's iframe and fingerprint scripts need.
+  Hosting: serve this file and viator-payment-page.js from the same directory over https, at the url the app
+  is configured with as ViatorCredentials.paymentPageURL. Viator's payment.js accepts the page only when
+  window.location.origin equals the hostingUrl sent with the booking hold, and the native side derives that
+  hostingUrl from the same url, so the page and the hold always agree.
+
+  Scripts: Viator's payment.js is an ES module, so its tag must carry type="module"; it defines window.Payment
+  after the document is parsed. The page's own script is loaded without defer so that window.trpViatorPayment
+  exists before the host's didFinish, and start waits for both the document and window.Payment.
+
+  Talking to the app: ViatorPaymentWebSession (iOS) loads the page and, once it has loaded, evaluates
+  window.trpViatorPayment.start({sessionToken, language}) with the paymentSessionToken from the hold. The page
+  renders Viator's card iframe, collects the billing country and postal code that submitForm requires, and
+  answers through window.webkit.messageHandlers.viatorPayment (iOS) or window.AndroidViator (Android):
+    {event: "ready"}                          the card form has loaded
+    {event: "success", paymentToken}          submitForm succeeded; the token goes to /bookings/cart/book
+    {event: "error", message, code?}          the form cannot start or the payment session is unusable
+    {event: "cancel"}                         the customer tapped Cancel
+  Android receives onPaymentSuccess(token), onPaymentError(message) and onPaymentCancel().
+  A declined or invalid card and a cancelled or failed 3DS challenge stay on the page so the customer can retry.
+
+  Content Security Policy: the meta tag below allows both Viator environments so one file serves both.
+  A production-only deployment can drop the sandbox hosts:
+    sandbox only     frame-src   https://api.staging.tapayments.com https://test.accdab.net https://staging.cdn-net.com
+                     script-src  https://test.accdab.net https://staging.cdn-net.com
+                     connect-src https://checkout-api-hare.payments-dev.tamg.cloud https://test.accdab.net https://staging.cdn-net.com
+    production only  frame-src   https://api.tapayments.com https://prod.accdab.net https://www.cdn-net.com
+                     script-src  https://prod.accdab.net https://www.cdn-net.com
+                     connect-src https://checkout-api.payments.tamg.cloud https://prod.accdab.net https://www.cdn-net.com
+  Every other host listed (checkout-assets, six.cdn-net.com, riskified, stripe) is needed by both.
+  The page's own script is a separate file so script-src needs no 'unsafe-inline'.
 -->
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; script-src 'self' https://checkout-assets.payments.tamg.cloud; frame-src https://*.payments.tamg.cloud; connect-src https://*.payments.tamg.cloud; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; frame-src 'self' https://api.staging.tapayments.com https://test.accdab.net https://staging.cdn-net.com https://api.tapayments.com https://prod.accdab.net https://www.cdn-net.com https://*.js.stripe.com https://js.stripe.com https://hooks.stripe.com; script-src 'self' https://checkout-assets.payments.tamg.cloud https://test.accdab.net https://staging.cdn-net.com https://prod.accdab.net https://www.cdn-net.com https://six.cdn-net.com https://beacon.riskified.com https://*.js.stripe.com https://js.stripe.com; connect-src 'self' https://checkout-api-hare.payments-dev.tamg.cloud https://checkout-api.payments.tamg.cloud https://test.accdab.net https://staging.cdn-net.com https://prod.accdab.net https://www.cdn-net.com https://beacon.riskified.com https://c.riskified.com https://api.stripe.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:">
   <title>Payment</title>
-  <script src="https://checkout-assets.payments.tamg.cloud/stable/v2/payment.js"></script>
   <style>
     body { margin: 0; padding: 16px; font: 16px -apple-system, system-ui, sans-serif; background: #fff; color: #111; }
-    #pay { width: 100%; margin-top: 16px; padding: 14px; font-size: 17px; border: 0; border-radius: 10px; background: #0a66ff; color: #fff; }
+    label { display: block; margin: 12px 0 4px; font-size: 14px; color: #444; }
+    select, input { box-sizing: border-box; width: 100%; padding: 12px; font-size: 16px; border: 1px solid #ccc; border-radius: 8px; background: #fff; color: #111; }
+    #card-form { margin-top: 8px; min-height: 120px; }
+    button { width: 100%; margin-top: 16px; padding: 14px; font-size: 17px; border: 0; border-radius: 10px; }
+    #pay { background: #0a66ff; color: #fff; }
     #pay:disabled { opacity: .5; }
+    #cancel { margin-top: 8px; background: transparent; color: #0a66ff; }
     #error { color: #c00; min-height: 1.2em; margin-top: 12px; }
   </style>
+  <script type="module" src="https://checkout-assets.payments.tamg.cloud/stable/v2/payment.js"></script>
+  <script src="viator-payment-page.js"></script>
 </head>
 <body>
   <div id="card-form"></div>
-  <button id="pay" disabled>Pay</button>
+  <label for="country" id="country-label">Billing country</label>
+  <select id="country" autocomplete="country"></select>
+  <label for="postal-code" id="postal-code-label">Postal code</label>
+  <input id="postal-code" type="text" autocomplete="postal-code" autocapitalize="characters" spellcheck="false" maxlength="16">
   <div id="error" role="alert"></div>
-  <script>
-    (function () {
-      function post(message) {
-        if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.viatorPayment) {
-          window.webkit.messageHandlers.viatorPayment.postMessage(message);
-        } else if (window.AndroidViator) {
-          if (message.event === 'success') window.AndroidViator.onPaymentSuccess(message.paymentToken);
-          else if (message.event === 'error') window.AndroidViator.onPaymentError(message.message || '');
-          else if (message.event === 'cancel') window.AndroidViator.onPaymentCancel();
-        }
-      }
-
-      var payButton = document.getElementById('pay');
-      var errorLabel = document.getElementById('error');
-      var payment = null;
-
-      window.trpViatorPayment = {
-        start: function (options) {
-          try {
-            payment = new Payment({
-              sessionToken: options.sessionToken,
-              language: options.language,
-              container: '#card-form',
-              onSubmitSuccess: function (result) {
-                post({ event: 'success', paymentToken: result && result.paymentToken ? result.paymentToken : result });
-              },
-              onSubmitError: function (error) {
-                payButton.disabled = false;
-                errorLabel.textContent = (error && error.message) || 'The payment could not be completed.';
-              }
-            });
-            payButton.disabled = false;
-            post({ event: 'ready' });
-          } catch (error) {
-            post({ event: 'error', message: String(error) });
-          }
-        },
-        cancel: function () { post({ event: 'cancel' }); }
-      };
-
-      payButton.addEventListener('click', function () {
-        if (!payment) return;
-        payButton.disabled = true;
-        errorLabel.textContent = '';
-        payment.submitForm();
-      });
-    })();
-  </script>
+  <button id="pay" type="button" disabled>Pay</button>
+  <button id="cancel" type="button">Cancel</button>
 </body>
 </html>

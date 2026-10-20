@@ -55,6 +55,8 @@ public actor ViatorCheckout {
     /// How long a hold lives when Viator does not say.
     public static let defaultHoldLifetime: TimeInterval = 10 * 60
 
+    /// The app language, used to choose a guide language where the product offers several.
+    public let languageCode: String
     private let service: ViatorBookingService
     private let store: BookingRecordStore
     private let backgroundTasks: BackgroundTaskRunning
@@ -68,6 +70,7 @@ public actor ViatorCheckout {
 
     public init(service: ViatorBookingService,
                 store: BookingRecordStore,
+                languageCode: String = "en",
                 backgroundTasks: BackgroundTaskRunning = BookingConfiguration.defaultBackgroundTaskRunner,
                 validator: ViatorSelectionValidator = ViatorSelectionValidator(),
                 maximumHolds: Int = 3,
@@ -76,6 +79,7 @@ public actor ViatorCheckout {
                 now: @escaping @Sendable () -> Date = { Date() }) {
         self.service = service
         self.store = store
+        self.languageCode = languageCode
         self.backgroundTasks = backgroundTasks
         self.validator = validator
         self.maximumHolds = max(1, maximumHolds)

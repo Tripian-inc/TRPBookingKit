@@ -57,13 +57,12 @@ final class ViatorCheckoutFlow: ProviderCheckoutFlow {
     }
 
     func back() async throws {
-        guard let stepId = snapshot.step?.id, let index = Self.steps.firstIndex(of: stepId), index > 0 else {
-            throw FlowRejection.stepMismatch
-        }
-        show(Self.steps[index - 1])
+        guard let stepId = snapshot.backStepId(in: Self.steps) else { throw FlowRejection.stepMismatch }
+        show(stepId)
     }
 
     func act(result: BC.ActionResult) async throws {
+        if result.status?.value == .canceled { return }
         guard let token = result.paymentToken, let hold, let details, let productContext else {
             throw FlowRejection.validation([BC.ErrorData.FieldError(field: "paymentToken", message: "The payment form returned no token.")])
         }
@@ -191,7 +190,7 @@ final class ViatorCheckoutFlow: ProviderCheckoutFlow {
         }
         details = ViatorBookerDetails(firstName: submitted.string("lead.firstName") ?? "", lastName: submitted.string("lead.lastName") ?? "",
                                       email: submitted.string("lead.email") ?? "", phone: submitted.string("lead.phone") ?? "",
-                                      answers: pickup)
+                                      answers: pickup, languageGuide: languageGuide())
         try await placeHold(force: false)
     }
 
@@ -224,7 +223,8 @@ final class ViatorCheckoutFlow: ProviderCheckoutFlow {
         guard let hold else { return }
         snapshot.status = .awaitingPayment
         snapshot.step = nil
-        snapshot.allowed = [.cancel]
+        snapshot.paymentStepId = Self.steps.last
+        snapshot.allowed = [.back, .cancel]
         snapshot.nextAction = .providerHostedForm(BC.NextAction.Payload(
             id: actionId, params: BC.ProviderHostedFormParams(paymentSessionToken: hold.paymentSessionToken),
             expiresAt: LocalFormat.iso(hold.deadline.expiresAt)))
@@ -329,6 +329,14 @@ final class ViatorCheckoutFlow: ProviderCheckoutFlow {
         blocks.append(LocalBlocks.terms("I accept the terms of sale.",
                                         link: BC.ConsentBlock.Link(title: "Terms", url: "https://www.tripian.com/terms")))
         return blocks
+    }
+
+    /// The guide for the chosen option, falling back to the product's own list.
+    private func languageGuide() -> ViatorLanguageGuide? {
+        guard let product else { return nil }
+        let option = product.options.first { $0.productOptionCode == item?.productOptionCode }
+        let offered = option.map(\.languageGuides).flatMap { $0.isEmpty ? nil : $0 } ?? product.languageGuides
+        return ViatorLanguageGuide.preferred(from: offered, languageCode: viator.languageCode)
     }
 
     private func orderedItems(_ product: ViatorProduct) -> [ViatorAvailability.Item] {

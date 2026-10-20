@@ -60,6 +60,7 @@ final class LocalViatorContractTests: XCTestCase {
 
     func testHappyPathIncludingBack() async throws {
         try await replay(Self.flow[...])
+        XCTAssertEqual(service.bookedDetails?.languageGuide, ViatorLanguageGuide(type: "GUIDE", language: "en", legacyGuide: "en/SERVICE_GUIDE"))
         for name in ["11-bookings", "12-booking"] {
             try await assertLocalSnapshot(directory, name, checkout: checkout, bookings: bookings,
                                           excluding: name == "11-bookings" ? ["[*].vouchers[1]"] : Self.bookingExclusions)
@@ -87,6 +88,44 @@ final class LocalViatorContractTests: XCTestCase {
         service.bookResult = .failure(BookingError.server(status: 402, code: "PAYMENT_DECLINED", message: nil))
         service.holdResult = .success(try decodeJSON(ViatorHold.self, Self.holdJSON(token: "vps_2Pd6JsV0cY5nE1uG")))
         try await assertLocalSnapshot("viator/errors", "PAYMENT_DECLINED", checkout: checkout, bookings: bookings)
+    }
+
+    func testCanceledPaymentLeavesCheckoutUnchanged() async throws {
+        try await replay(Self.flow[0..<8])
+        let recordsBefore = await store.all().count
+        let response = try await checkout.action(checkoutId: "chk_01J9ZQ4M8K", actionId: "act_01J9ZR2B",
+                                                 result: BookingContract.ActionResult(status: .init(.canceled)), lang: "en")
+        XCTAssertEqual(response.checkout.status.value, .awaitingPayment)
+        XCTAssertEqual(response.checkout.nextAction?.id, "act_01J9ZR2B")
+        XCTAssertEqual(response.checkout.allowedActions.map(\.value), [.back, .cancel])
+        XCTAssertEqual(service.bookCallCount, 0)
+        XCTAssertEqual(service.holdCallCount, 1)
+        let recordsAfter = await store.all().count
+        XCTAssertEqual(recordsAfter, recordsBefore)
+    }
+
+    func testBackFromAwaitingPaymentShowsSummaryAndKeepsHold() async throws {
+        try await replay(Self.flow[0..<8])
+        let back = try await checkout.back(checkoutId: "chk_01J9ZQ4M8K", fromStepId: "summary", lang: "en")
+        XCTAssertEqual(back.checkout.status.value, .collectingDetails)
+        XCTAssertEqual(back.checkout.currentStep?.id, "summary")
+        XCTAssertNil(back.checkout.nextAction)
+        XCTAssertTrue(back.checkout.allowedActions.contains { $0.value == .submit })
+        let resubmitted = try await checkout.submit(checkoutId: "chk_01J9ZQ4M8K", stepId: "summary", answers: ["terms": true], lang: "en")
+        XCTAssertEqual(resubmitted.checkout.status.value, .awaitingPayment)
+        XCTAssertNotNil(resubmitted.checkout.nextAction)
+        XCTAssertEqual(service.holdCallCount, 1)
+        XCTAssertEqual(service.bookCallCount, 0)
+    }
+
+    func testBackFromAwaitingPaymentRejectsOtherStep() async throws {
+        try await replay(Self.flow[0..<8])
+        do {
+            _ = try await checkout.back(checkoutId: "chk_01J9ZQ4M8K", fromStepId: "details", lang: "en")
+            XCTFail("Expected STEP_MISMATCH")
+        } catch let error as BookingContract.ContractError {
+            XCTAssertEqual(error.data.code.value, .stepMismatch)
+        }
     }
 
     func testVersionUnsupported() async throws {
@@ -123,7 +162,9 @@ final class LocalViatorContractTests: XCTestCase {
        {"ageBand": "ADULT", "startAge": 13, "endAge": 99, "minTravelersPerBooking": 1, "maxTravelersPerBooking": 9},
        {"ageBand": "CHILD", "startAge": 4, "endAge": 12, "minTravelersPerBooking": 0, "maxTravelersPerBooking": 9}]},
      "bookingRequirements": {"minTravelersPerBooking": 1, "maxTravelersPerBooking": 9},
-     "productOptions": [{"productOptionCode": "TG1", "title": "Guided tour in English"},
+     "productOptions": [{"productOptionCode": "TG1", "title": "Guided tour in English",
+                         "languageGuides": [{"type": "GUIDE", "language": "es", "legacyGuide": "es/SERVICE_GUIDE"},
+                                            {"type": "GUIDE", "language": "en", "legacyGuide": "en/SERVICE_GUIDE"}]},
                         {"productOptionCode": "TG2", "title": "Guided tour with tower access"}],
      "logistics": {"travelerPickup": {"pickupOptionType": "PICKUP_EVERYONE", "locations": [{"location": {"ref": "hotel_123"}}]}},
      "cancellationPolicy": {"refundEligibility": [{"dayRangeMin": 1, "percentageRefundable": 100}]}}
