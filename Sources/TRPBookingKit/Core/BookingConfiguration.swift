@@ -4,11 +4,36 @@ import Foundation
 public struct ToristyCredentials: Sendable, Hashable {
     public let apiKey: String
     public let baseURL: URL
+    /// Toristy's hosted cart page, where the customer pays for a reserved cart.
+    public let hostedCartURL: URL
+    /// Sent to the hosted cart page as `host`.
+    public let hostedCartHostOrigin: String
 
-    public init(apiKey: String, baseURL: URL = URL(string: "https://api.toristy.com")!) {
+    public init(apiKey: String,
+                baseURL: URL = URL(string: "https://api.toristy.com")!,
+                hostedCartURL: URL = URL(string: "https://embed.toristy.com/cart")!,
+                hostedCartHostOrigin: String = "https://embed.toristy.com") {
         self.apiKey = apiKey
         self.baseURL = baseURL
+        self.hostedCartURL = hostedCartURL
+        self.hostedCartHostOrigin = hostedCartHostOrigin
     }
+}
+
+/// How the customer pays for a Toristy booking.
+public enum ToristyPaymentMode: String, Sendable, Hashable {
+    /// On Toristy's own hosted cart page; needs only the Toristy credentials.
+    case hostedCart
+    /// Through a Stripe PaymentIntent the host creates, after which the kit confirms the cart.
+    case stripe
+}
+
+/// How the customer pays for a Victory (Ticket Evolution) booking.
+public enum VictoryPaymentMode: String, Sendable, Hashable {
+    /// On Ticket Evolution's hosted checkout page at `VictoryCredentials.checkoutBaseURL`; the kit places no order.
+    case hostedCheckout
+    /// Through a Braintree Drop-in, after which the kit places the order with Ticket Evolution.
+    case braintreeDropin
 }
 
 /// Viator Partner API credentials.
@@ -76,13 +101,17 @@ public struct VictoryCredentials: Sendable, Hashable {
     public let baseURL: URL
     /// The office that sells the tickets, required when creating clients and orders.
     public let officeId: Int?
+    /// Where Ticket Evolution's hosted checkout page lives; `VictoryPaymentMode.hostedCheckout` needs it.
+    public let checkoutBaseURL: URL?
 
-    public init(token: String, secret: String, environment: Environment, officeId: Int? = nil, baseURL: URL? = nil) {
+    public init(token: String, secret: String, environment: Environment, officeId: Int? = nil, baseURL: URL? = nil,
+                checkoutBaseURL: URL? = nil) {
         self.token = token
         self.secret = secret
         self.environment = environment
         self.officeId = officeId
         self.baseURL = baseURL ?? environment.baseURL
+        self.checkoutBaseURL = checkoutBaseURL
     }
 }
 
@@ -99,19 +128,27 @@ public struct BookingConfiguration: Sendable {
     public var preferredCurrency: String
     /// Customer language, sent where the provider supports it.
     public var languageCode: String
+    /// How the local checkout takes payment for Toristy.
+    public var toristyPaymentMode: ToristyPaymentMode
+    /// How the local checkout takes payment for Victory; `.braintreeDropin` unless the host opts into `.hostedCheckout`.
+    public var victoryPaymentMode: VictoryPaymentMode
 
     public init(registry: BookingProviderRegistry,
                 toristy: ToristyCredentials? = nil,
                 viator: ViatorCredentials? = nil,
                 victory: VictoryCredentials? = nil,
                 preferredCurrency: String = "EUR",
-                languageCode: String = "en") {
+                languageCode: String = "en",
+                toristyPaymentMode: ToristyPaymentMode = .hostedCart,
+                victoryPaymentMode: VictoryPaymentMode = .braintreeDropin) {
         self.registry = registry
         self.toristy = toristy
         self.viator = viator
         self.victory = victory
         self.preferredCurrency = preferredCurrency
         self.languageCode = languageCode
+        self.toristyPaymentMode = toristyPaymentMode
+        self.victoryPaymentMode = victoryPaymentMode
     }
 
     /// Whether the provider has credentials and so can be booked in the app.
