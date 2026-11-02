@@ -88,7 +88,7 @@ struct FlowRejection: Error {
         case let booking as BookingError:
             switch booking {
             case .invalidSelection(let messages):
-                return .validation(messages.map { BookingContract.ErrorData.FieldError(field: "answers", message: $0) })
+                return .validation(messages.map { .local(.invalidAnswer, field: "answers", message: $0) })
             case .holdExpired: return .holdExpired
             case .paymentFailed, .paymentCancelled: return .paymentDeclined
             case .notCancellable: return .notCancellable
@@ -185,18 +185,18 @@ extension BookingContract.Answers {
 
 /// Checks shared by the flows' detail steps.
 enum LocalValidation {
-    static func required(_ ids: [(id: String, message: String)], in answers: BookingContract.Answers) -> [BookingContract.ErrorData.FieldError] {
-        ids.filter { answers.string($0.id) == nil }.map { BookingContract.ErrorData.FieldError(field: $0.id, message: $0.message) }
+    static func required(_ ids: [(id: String, code: FieldErrorCode)], in answers: BookingContract.Answers) -> [BookingContract.ErrorData.FieldError] {
+        ids.filter { answers.string($0.id) == nil }.map { .local($0.code, field: $0.id) }
     }
 
     static func email(_ id: String, in answers: BookingContract.Answers) -> BookingContract.ErrorData.FieldError? {
         guard let email = answers.string(id) else { return nil }
         let pattern = "^[^@\\s]+@[^@\\s]+\\.[^@\\s]{2,}$"
         return email.range(of: pattern, options: .regularExpression) == nil
-            ? BookingContract.ErrorData.FieldError(field: id, message: "Enter a valid email address.") : nil
+            ? .local(.invalidEmail, field: id) : nil
     }
 
     static func consent(_ id: String, in answers: BookingContract.Answers) -> BookingContract.ErrorData.FieldError? {
-        answers[id]?.boolValue == true ? nil : BookingContract.ErrorData.FieldError(field: id, message: "Please accept the terms to continue.")
+        answers[id]?.boolValue == true ? nil : .local(.requiredTerms, field: id)
     }
 }

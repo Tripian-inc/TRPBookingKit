@@ -34,12 +34,16 @@ extension BookingContract {
         }
 
         /// A message about one answer; `field` is the field or block id.
+        ///
+        /// `code` is a stable, snake_case reason a client can translate; `message` is the English text to show without it.
         public struct FieldError: Codable, Hashable, Sendable {
             public let field: String
+            public let code: String?
             public let message: String
 
-            public init(field: String, message: String) {
+            public init(field: String, code: String? = nil, message: String) {
                 self.field = field
+                self.code = code
                 self.message = message
             }
         }

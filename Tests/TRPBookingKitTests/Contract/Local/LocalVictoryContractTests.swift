@@ -113,6 +113,48 @@ final class LocalVictoryContractTests: XCTestCase {
         }
     }
 
+    func testEmptyGroupSelectionReportsMissingSeatsCode() async throws {
+        try await replay(Self.flow[0..<1])
+        do {
+            _ = try await checkout.submit(checkoutId: "chk_01J9ZV3R6Q", stepId: "group", answers: [:], lang: "en")
+            XCTFail("Expected VALIDATION")
+        } catch let error as BookingContract.ContractError {
+            let fieldError = try XCTUnwrap(error.data.errors.first { $0.field == "group" })
+            XCTAssertEqual(fieldError.code, "missing_seats")
+            XCTAssertEqual(fieldError.message, "Choose available seats.")
+        }
+    }
+
+    func testDisallowedQuantityReportsInvalidTicketQuantityMessage() async throws {
+        try await replay(Self.flow[0..<2])
+        do {
+            _ = try await checkout.submit(checkoutId: "chk_01J9ZV3R6Q", stepId: "quantity",
+                                          answers: ["units": ["TICKET": 1]], lang: "en")
+            XCTFail("Expected VALIDATION")
+        } catch let error as BookingContract.ContractError {
+            let fieldError = try XCTUnwrap(error.data.errors.first { $0.field == "units" })
+            XCTAssertEqual(fieldError.code, "invalid_ticket_quantity")
+            XCTAssertEqual(fieldError.message, "These tickets are sold in quantities of 2, 4, 6.")
+        }
+    }
+
+    func testEmptyBuyerDetailsReportsRequiredContactAndBillingCodes() async throws {
+        try await replay(Self.flow[0..<4])
+        do {
+            _ = try await checkout.submit(checkoutId: "chk_01J9ZV3R6Q", stepId: "buyer", answers: [:], lang: "en")
+            XCTFail("Expected VALIDATION")
+        } catch let error as BookingContract.ContractError {
+            let codes = Dictionary(uniqueKeysWithValues: error.data.errors.map { ($0.field, $0.code) })
+            XCTAssertEqual(codes["buyer.firstName"], "required_first_name")
+            XCTAssertEqual(codes["buyer.email"], "required_email")
+            XCTAssertEqual(codes["billing.address1"], "required_billing_address")
+            XCTAssertEqual(codes["billing.city"], "required_billing_city")
+            XCTAssertEqual(codes["billing.postalCode"], "required_billing_postal_code")
+            XCTAssertEqual(codes["billing.country"], "required_billing_country")
+            XCTAssertEqual(codes["terms"], "required_terms")
+        }
+    }
+
     private static let buyerAnswers: BookingContract.Answers = [
         "buyer.firstName": "Maya", "buyer.lastName": "Brooks", "buyer.email": "maya@example.com", "buyer.phone": "+12125550143",
         "billing.address1": "350 W 50th St", "billing.city": "New York", "billing.postalCode": "10019", "billing.country": "US",

@@ -87,7 +87,7 @@ final class VictoryHostedCheckoutFlow: ProviderCheckoutFlow {
     private func submitGroup(_ submitted: BC.Answers) throws {
         guard let value = submitted.string("tickets"),
               let chosen = groups.first(where: { Self.optionId($0) == value }), !chosen.sellableQuantities.isEmpty else {
-            throw FlowRejection.validation([BC.ErrorData.FieldError(field: "tickets", message: "Choose available tickets.")])
+            throw FlowRejection.validation([.local(.missingTickets, field: "tickets")])
         }
         if chosen.id != group?.id { answers.forget("quantity") }
         group = chosen
@@ -99,7 +99,7 @@ final class VictoryHostedCheckoutFlow: ProviderCheckoutFlow {
         let quantity = submitted.units("units")[Self.unitId] ?? 0
         guard group.sellableQuantities.contains(quantity) else {
             let allowed = group.sellableQuantities.map(String.init).joined(separator: ", ")
-            throw FlowRejection.validation([BC.ErrorData.FieldError(field: "units", message: "These tickets are sold in quantities of \(allowed).")])
+            throw FlowRejection.validation([.local(.invalidTicketQuantity, field: "units", message: "These tickets are sold in quantities of \(allowed).")])
         }
         return quantity
     }

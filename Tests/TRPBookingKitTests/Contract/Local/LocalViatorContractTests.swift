@@ -74,7 +74,7 @@ final class LocalViatorContractTests: XCTestCase {
 
     func testValidation() async throws {
         try await replay(Self.flow[0..<4])
-        try await assertLocalSnapshot("viator/errors", "VALIDATION", checkout: checkout, bookings: bookings)
+        try await assertLocalSnapshot("viator/errors", "VALIDATION", checkout: checkout, bookings: bookings, excluding: ["errors[*].code"])
     }
 
     func testSupplierUnavailable() async throws {
@@ -125,6 +125,33 @@ final class LocalViatorContractTests: XCTestCase {
             XCTFail("Expected STEP_MISMATCH")
         } catch let error as BookingContract.ContractError {
             XCTAssertEqual(error.data.code.value, .stepMismatch)
+        }
+    }
+
+    func testInvalidEmailAtDetailsReportsInvalidEmailCode() async throws {
+        try await replay(Self.flow[0..<4])
+        do {
+            _ = try await checkout.submit(checkoutId: "chk_01J9ZQ4M8K", stepId: "details", answers: [
+                "lead.firstName": "Cem", "lead.lastName": "Yilmaz", "lead.email": "cem@example",
+                "lead.phone": "+905321234567", "pickup": ["text": "Cruise terminal, gate A"]
+            ], lang: "en")
+            XCTFail("Expected VALIDATION")
+        } catch let error as BookingContract.ContractError {
+            let fieldError = try XCTUnwrap(error.data.errors.first { $0.field == "lead.email" })
+            XCTAssertEqual(fieldError.code, "invalid_email")
+            XCTAssertEqual(fieldError.message, "Enter a valid email address.")
+        }
+    }
+
+    func testEmptyTravelersSubmissionReportsInvalidUnitsCode() async throws {
+        try await replay(Self.flow[0..<2])
+        do {
+            _ = try await checkout.submit(checkoutId: "chk_01J9ZQ4M8K", stepId: "travelers", answers: [:], lang: "en")
+            XCTFail("Expected VALIDATION")
+        } catch let error as BookingContract.ContractError {
+            let fieldError = try XCTUnwrap(error.data.errors.first { $0.field == "units" })
+            XCTAssertEqual(fieldError.code, "invalid_units")
+            XCTAssertEqual(fieldError.message, "Choose a valid number of travelers.")
         }
     }
 

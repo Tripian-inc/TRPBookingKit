@@ -222,6 +222,32 @@ final class LocalToristyContractTests: XCTestCase {
         }
     }
 
+    func testEmptyDateSubmissionReportsMissingDateCode() async throws {
+        try await replay(Self.flow[0..<1])
+        do {
+            _ = try await checkout.submit(checkoutId: "chk_01J9ZT7P2N", stepId: "date", answers: [:], lang: "en")
+            XCTFail("Expected VALIDATION")
+        } catch let error as BookingContract.ContractError {
+            let fieldError = try XCTUnwrap(error.data.errors.first { $0.field == "date" })
+            XCTAssertEqual(fieldError.code, "missing_date")
+            XCTAssertEqual(fieldError.message, "Choose one of the available dates.")
+        }
+    }
+
+    func testEmptyDetailsSubmissionReportsRequiredContactCodes() async throws {
+        try await replay(Self.flow[0..<5])
+        do {
+            _ = try await checkout.submit(checkoutId: "chk_01J9ZT7P2N", stepId: "details", answers: [:], lang: "en")
+            XCTFail("Expected VALIDATION")
+        } catch let error as BookingContract.ContractError {
+            let codes = Dictionary(uniqueKeysWithValues: error.data.errors.map { ($0.field, $0.code) })
+            XCTAssertEqual(codes["lead.firstName"], "required_first_name")
+            XCTAssertEqual(codes["lead.lastName"], "required_last_name")
+            XCTAssertEqual(codes["lead.email"], "required_email")
+            XCTAssertEqual(codes["lead.phone"], "required_phone")
+        }
+    }
+
     private func recordStatus(_ cartId: String) async -> BookingRecordStatus? {
         await store.all().first { $0.reference.primary == cartId }?.status
     }

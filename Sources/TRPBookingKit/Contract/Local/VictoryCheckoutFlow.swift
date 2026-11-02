@@ -120,7 +120,7 @@ final class VictoryCheckoutFlow: ProviderCheckoutFlow {
 
     private func submitGroup(_ submitted: BC.Answers) throws {
         guard let value = submitted.string("group"), let chosen = offers?.ticketGroups.first(where: { Self.optionId($0) == value }) else {
-            throw FlowRejection.validation([BC.ErrorData.FieldError(field: "group", message: "Choose available seats.")])
+            throw FlowRejection.validation([.local(.missingSeats, field: "group")])
         }
         if chosen != group { quote = nil }
         group = chosen
@@ -133,7 +133,7 @@ final class VictoryCheckoutFlow: ProviderCheckoutFlow {
         let quantity = submitted.units("units")[Self.unitId] ?? 0
         guard group.sellableQuantities.contains(quantity) else {
             let allowed = group.sellableQuantities.map(String.init).joined(separator: ", ")
-            throw FlowRejection.validation([BC.ErrorData.FieldError(field: "units", message: "These tickets are sold in quantities of \(allowed).")])
+            throw FlowRejection.validation([.local(.invalidTicketQuantity, field: "units", message: "These tickets are sold in quantities of \(allowed).")])
         }
         let current = try await victory.offers(eventId: eventId)
         offers = current
@@ -165,12 +165,12 @@ final class VictoryCheckoutFlow: ProviderCheckoutFlow {
             throw FlowRejection.priceChanged
         }
         var errors = LocalBlocks.contactErrors("buyer", in: submitted)
-        errors += LocalValidation.required([("billing.address1", "Enter the billing address."), ("billing.city", "Enter the city."),
-                                            ("billing.postalCode", "Enter the postal code."), ("billing.country", "Choose the country.")],
+        errors += LocalValidation.required([("billing.address1", .requiredBillingAddress), ("billing.city", .requiredBillingCity),
+                                            ("billing.postalCode", .requiredBillingPostalCode), ("billing.country", .requiredBillingCountry)],
                                            in: submitted)
         let country = submitted.string("billing.country") ?? "US"
         if country == "US" {
-            errors += LocalValidation.required([("billing.state", "Choose the state.")], in: submitted)
+            errors += LocalValidation.required([("billing.state", .requiredBillingState)], in: submitted)
         }
         if let consent = LocalValidation.consent("terms", in: submitted) { errors.append(consent) }
         guard errors.isEmpty else { throw FlowRejection.validation(errors) }

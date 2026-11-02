@@ -31,10 +31,10 @@ enum LocalBlocks {
     }
 
     static func contactErrors(_ prefix: String, in answers: BC.Answers) -> [BC.ErrorData.FieldError] {
-        var errors = LocalValidation.required([("\(prefix).firstName", "Enter a first name."),
-                                               ("\(prefix).lastName", "Enter a last name."),
-                                               ("\(prefix).email", "Enter an email address."),
-                                               ("\(prefix).phone", "Enter a phone number.")], in: answers)
+        var errors = LocalValidation.required([("\(prefix).firstName", .requiredFirstName),
+                                               ("\(prefix).lastName", .requiredLastName),
+                                               ("\(prefix).email", .requiredEmail),
+                                               ("\(prefix).phone", .requiredPhone)], in: answers)
         if let email = LocalValidation.email("\(prefix).email", in: answers) { errors.append(email) }
         return errors
     }

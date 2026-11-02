@@ -46,7 +46,7 @@ public actor LocalCheckoutClient: CheckoutClient {
         try checkVersion()
         guard let product = await catalog.product(id: request.productId) else {
             throw BC.ContractError(httpStatus: 422, data: BC.ErrorData(
-                code: .init(.validation), errors: [BC.ErrorData.FieldError(field: "productId", message: "This product cannot be booked in the app.")],
+                code: .init(.validation), errors: [.local(.productNotBookable, field: "productId")],
                 retryable: false, checkout: nil))
         }
         let context = FlowContext(checkoutId: identifiers.next("chk_"), bookingUuid: request.bookingUuid, product: product,

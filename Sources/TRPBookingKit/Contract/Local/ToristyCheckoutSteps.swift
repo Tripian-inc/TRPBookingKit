@@ -124,7 +124,7 @@ final class ToristyCheckoutSteps {
 
     private func submitDate(_ submitted: BC.Answers) throws {
         guard let value = submitted.string("date"), let chosen = BookingDate(value), availableDates.contains(chosen) else {
-            throw FlowRejection.validation([BC.ErrorData.FieldError(field: "date", message: "Choose one of the available dates.")])
+            throw FlowRejection.validation([.local(.missingDate, field: "date")])
         }
         if chosen != date {
             startTime = nil
@@ -135,7 +135,7 @@ final class ToristyCheckoutSteps {
 
     private func submitTime(_ submitted: BC.Answers) throws {
         guard let value = submitted.string("time"), let chosen = departures.first(where: { $0.time == value }) else {
-            throw FlowRejection.validation([BC.ErrorData.FieldError(field: "time", message: "Choose a start time.")])
+            throw FlowRejection.validation([.local(.missingTime, field: "time")])
         }
         guard chosen.isBookable else { throw FlowRejection.soldOut }
         if chosen != startTime { rate = nil }
@@ -144,7 +144,7 @@ final class ToristyCheckoutSteps {
 
     private func submitRate(_ submitted: BC.Answers) throws {
         guard let value = submitted.string("rate"), let chosen = offeredRates.first(where: { $0.id == value }) else {
-            throw FlowRejection.validation([BC.ErrorData.FieldError(field: "rate", message: "Choose a rate.")])
+            throw FlowRejection.validation([.local(.missingRate, field: "rate")])
         }
         if chosen != rate {
             units = chosen.prices.filter { startTime?.rate(id: chosen.id)?.accepts(pricingCategoryId: $0.id) ?? true }.map { ($0, 0) }
@@ -159,7 +159,7 @@ final class ToristyCheckoutSteps {
         let total = chosen.reduce(0) { $0 + $1.count }
         guard total >= totalBounds.min, total <= totalBounds.max,
               chosen.allSatisfy({ $0.count >= ($0.category.minPerBooking ?? 0) && $0.count <= ($0.category.maxPerBooking ?? totalBounds.max) }) else {
-            throw FlowRejection.validation([BC.ErrorData.FieldError(field: "units", message: "Choose a valid number of travelers.")])
+            throw FlowRejection.validation([.local(.invalidUnits, field: "units")])
         }
         units = chosen
         snapshot.amount = estimatedTotal.map { LocalFormat.money($0, context.currency) }
@@ -167,9 +167,9 @@ final class ToristyCheckoutSteps {
 
     private func submitDetails(_ submitted: BC.Answers) async throws {
         var errors = LocalBlocks.contactErrors("lead", in: submitted)
-        let travelerFields = travelers.enumerated().flatMap { index, category -> [(String, String)] in
-            var fields = [("t\(index + 1).fullName", "Enter the traveler's full name.")]
-            if category.maxAge != nil { fields.append(("t\(index + 1).birthDate", "Enter the traveler's date of birth.")) }
+        let travelerFields = travelers.enumerated().flatMap { index, category -> [(String, FieldErrorCode)] in
+            var fields: [(String, FieldErrorCode)] = [("t\(index + 1).fullName", .requiredTravelerName)]
+            if category.maxAge != nil { fields.append(("t\(index + 1).birthDate", .requiredTravelerBirthDate)) }
             return fields
         }
         errors += LocalValidation.required(travelerFields, in: submitted)

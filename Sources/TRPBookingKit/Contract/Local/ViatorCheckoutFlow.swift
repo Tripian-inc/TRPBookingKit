@@ -64,7 +64,7 @@ final class ViatorCheckoutFlow: ProviderCheckoutFlow {
     func act(result: BC.ActionResult) async throws {
         if result.status?.value == .canceled { return }
         guard let token = result.paymentToken, let hold, let details, let productContext else {
-            throw FlowRejection.validation([BC.ErrorData.FieldError(field: "paymentToken", message: "The payment form returned no token.")])
+            throw FlowRejection.validation([.local(.missingPaymentToken, field: "paymentToken")])
         }
         snapshot.status = .processing
         snapshot.nextAction = nil
@@ -142,7 +142,7 @@ final class ViatorCheckoutFlow: ProviderCheckoutFlow {
 
     private func submitDate(_ submitted: BC.Answers) async throws {
         guard let value = submitted.string("date"), let chosen = BookingDate(value), availableDates.contains(chosen) else {
-            throw FlowRejection.validation([BC.ErrorData.FieldError(field: "date", message: "Choose one of the available dates.")])
+            throw FlowRejection.validation([.local(.missingDate, field: "date")])
         }
         date = chosen
         guard let product, let date else { return }
@@ -157,7 +157,7 @@ final class ViatorCheckoutFlow: ProviderCheckoutFlow {
         let total = chosen.reduce(0) { $0 + $1.count }
         guard let product, let date, total >= totalBounds.min, total <= totalBounds.max,
               chosen.allSatisfy({ $0.count >= ($0.band.minTravelersPerBooking ?? 0) && $0.count <= ($0.band.maxTravelersPerBooking ?? total) }) else {
-            throw FlowRejection.validation([BC.ErrorData.FieldError(field: "units", message: "Choose a valid number of travelers.")])
+            throw FlowRejection.validation([.local(.invalidUnits, field: "units")])
         }
         units = chosen
         let pax = chosen.filter { $0.count > 0 }.map { ViatorPax(ageBand: $0.band.ageBand, numberOfTravelers: $0.count) }
@@ -171,7 +171,7 @@ final class ViatorCheckoutFlow: ProviderCheckoutFlow {
     private func submitOption(_ submitted: BC.Answers) throws {
         guard let value = submitted.string("option"), let product,
               let chosen = orderedItems(product).first(where: { optionValue($0) == value }) else {
-            throw FlowRejection.validation([BC.ErrorData.FieldError(field: "option", message: "Choose a tour and time.")])
+            throw FlowRejection.validation([.local(.missingOption, field: "option")])
         }
         guard chosen.available else { throw FlowRejection.soldOut }
         item = chosen
