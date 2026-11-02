@@ -129,6 +129,15 @@ public protocol BookingClient: Sendable {
                 idempotencyKey: BookingContract.IdempotencyKey) async throws -> BookingContract.Booking
 }
 
+/// A booking client that can ask for the cancellation terms as they apply now, before the traveller confirms.
+///
+/// Optional: a host checks `client as? BookingCancellationQuoting` and keeps the booking's stored cancellation otherwise.
+public protocol BookingCancellationQuoting: Sendable {
+
+    /// `GET /bookings/{uuid}/cancellation`: the refund the provider would grant if the booking were cancelled now.
+    func cancellationQuote(uuid: String) async throws -> BookingContract.Booking.Cancellation
+}
+
 extension BookingClient {
 
     /// `cancel` with a fresh idempotency key.

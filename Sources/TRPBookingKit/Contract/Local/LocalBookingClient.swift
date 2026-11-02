@@ -4,7 +4,7 @@ import Foundation
 ///
 /// Bookings live on the device only, the status comes from the record, and cancelling a
 /// Ticket Evolution order always answers `NOT_CANCELLABLE`. An unknown uuid answers `404` with the code `NOT_FOUND`.
-public struct LocalBookingClient: BookingClient {
+public struct LocalBookingClient: BookingClient, BookingCancellationQuoting {
     public typealias BC = BookingContract
 
     private let store: BookingRecordStore
@@ -70,6 +70,29 @@ public struct LocalBookingClient: BookingClient {
         return cancelled
     }
 
+    /// Viator answers its live cancel quote, Toristy and Victory the cancellation stored at booking time.
+    ///
+    /// The quoted cancellation replaces the stored one, so later reads show the same numbers.
+    public func cancellationQuote(uuid: String) async throws -> BC.Booking.Cancellation {
+        try checkVersion()
+        let record = try await record(uuid)
+        guard let booking = record.contractBooking else { throw Self.notFound }
+        guard record.reference.provider == .viator, let viator else { return booking.cancellation }
+        let quoted: BC.Booking.Cancellation
+        do {
+            quoted = booking.cancellation.quoted(by: try await viator.cancelQuote(record.reference), amount: booking.amount)
+        } catch let error as BC.ContractError {
+            throw error
+        } catch BookingError.notCancellable {
+            quoted = booking.cancellation.disallowed()
+        } catch {
+            throw BC.ContractError(httpStatus: 503, data: BC.ErrorData(code: .init(.supplierUnavailable), errors: [],
+                                                                       retryable: true, checkout: nil))
+        }
+        await store.update(record.reference) { $0.contractBooking = $0.contractBooking?.with(cancellation: quoted) }
+        return quoted
+    }
+
     private static let notFound = BC.ContractError(httpStatus: 404, data: BC.ErrorData(
         code: .init(rawValue: "NOT_FOUND"), errors: [], retryable: false, checkout: nil))
 
@@ -117,6 +140,35 @@ extension BookingContract.Booking {
         return with(status: .cancelled, vouchers: [],
                     cancellation: Cancellation(allowed: false, deadline: nil, refund: cancellation.refund, refundAmount: policyAmount),
                     refund: .some(policyAmount.map { Refund(status: .init(.pending), amount: $0) }))
+    }
+}
+
+extension BookingContract.Booking.Cancellation {
+    /// These terms updated by a Viator cancel quote; `amount` supplies the currency when the quote has none.
+    ///
+    /// The quote carries no deadline, so the stored one stays. Only the status `CANCELLABLE` allows cancelling, and
+    /// once the quote decides the refund policy its amount, possibly none, replaces the stored one.
+    func quoted(by quote: ViatorCancelQuote, amount: BookingContract.Money) -> BookingContract.Booking.Cancellation {
+        let currency = quote.currencyCode ?? refundAmount?.currency ?? amount.currency
+        let quotedAmount = quote.refundAmount.map { LocalFormat.money($0, currency) }
+        let policy = Self.policy(of: quote)
+        return BookingContract.Booking.Cancellation(allowed: quote.status?.uppercased() == "CANCELLABLE",
+                                                    deadline: deadline,
+                                                    refund: policy.map { .init($0) } ?? refund,
+                                                    refundAmount: policy == nil ? quotedAmount ?? refundAmount : quotedAmount)
+    }
+
+    /// These terms with cancelling no longer allowed.
+    func disallowed() -> BookingContract.Booking.Cancellation {
+        BookingContract.Booking.Cancellation(allowed: false, deadline: deadline, refund: refund, refundAmount: refundAmount)
+    }
+
+    private static func policy(of quote: ViatorCancelQuote) -> BookingContract.RefundPolicy? {
+        if let percentage = quote.refundPercentage {
+            return percentage >= 100 ? .full : percentage > 0 ? .partial : BookingContract.RefundPolicy.none
+        }
+        guard let refund = quote.refundAmount, let price = quote.itemPrice, price > 0 else { return nil }
+        return refund >= price ? .full : refund > 0 ? .partial : BookingContract.RefundPolicy.none
     }
 }
 

@@ -174,3 +174,13 @@ extension BookingContract {
         }
     }
 }
+
+extension BookingContract.Booking {
+    /// A copy carrying `cancellation` in place of its own terms.
+    public func with(cancellation: Cancellation) -> BookingContract.Booking {
+        BookingContract.Booking(uuid: uuid, status: status, provider: provider, providerReference: providerReference,
+                                product: product, units: units, start: start, durationMinutes: durationMinutes,
+                                meetingPoint: meetingPoint, amount: amount, utcExpiresAt: utcExpiresAt, vouchers: vouchers,
+                                cancellation: cancellation, refund: refund, contact: contact)
+    }
+}

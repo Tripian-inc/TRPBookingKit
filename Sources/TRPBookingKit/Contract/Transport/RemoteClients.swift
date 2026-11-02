@@ -116,7 +116,7 @@ public final class RemoteCheckoutClient: CheckoutClient, Sendable {
 ///
 /// `baseURL` is the contract's server URL, the paths are appended to it, so for tour-api it ends in `/tour-api`.
 /// A transport failure is rethrown as `URLSession` reported it; an unreadable answer is a `CheckoutClientError`.
-public final class RemoteBookingClient: BookingClient, Sendable {
+public final class RemoteBookingClient: BookingClient, BookingCancellationQuoting, Sendable {
     private let transport: ContractHTTPTransport
 
     public init(baseURL: URL, session: URLSession = .shared, decorator: ContractRequestDecorating) {
@@ -150,6 +150,19 @@ public final class RemoteBookingClient: BookingClient, Sendable {
         return try ContractResponseDecoder.payload(BookingContract.Booking.self, httpStatus: response.status,
                                                    body: response.body)
     }
+
+    /// `GET /bookings/{uuid}/cancellation`; a server that answers `404` gets `GET /bookings/{uuid}` instead,
+    /// whose cancellation does not depend on `lang`.
+    public func cancellationQuote(uuid: String) async throws -> BookingContract.Booking.Cancellation {
+        let response = try await transport.send(.get, "/bookings/\(ReplayPath.segment(uuid))/cancellation")
+        guard response.status != 404 else {
+            return try await get(uuid: uuid, lang: Self.fallbackLanguage).cancellation
+        }
+        return try ContractResponseDecoder.payload(BookingContract.Booking.Cancellation.self,
+                                                   httpStatus: response.status, body: response.body)
+    }
+
+    private static let fallbackLanguage = "en"
 }
 
 /// Builds, decorates and sends one contract request, shared by the remote clients.

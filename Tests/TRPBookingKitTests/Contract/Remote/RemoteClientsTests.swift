@@ -137,6 +137,59 @@ final class RemoteClientsTests: XCTestCase {
         XCTAssertNotNil(page.pagination)
     }
 
+    func testCancellationQuoteDecodesTheDedicatedEndpointsEnvelope() async throws {
+        StubURLProtocol.answer([BC.RecordedResponse(status: 200, body: .object([
+            "status": .number(200), "success": .bool(true),
+            "data": .object(["allowed": .bool(true), "deadline": .string("2026-10-14T08:30:00Z"), "refund": .string("partial"),
+                             "refundAmount": .object(["amount": .string("31.25"), "currency": .string("EUR")])])
+        ]))])
+        let bookings = RemoteBookingClient(baseURL: baseURL, session: StubURLProtocol.session,
+                                           decorator: StaticContractHeaders([:]))
+
+        let cancellation = try await bookings.cancellationQuote(uuid: "3f6c1a9e-8d2b-4b7a-a1c4-5e9f0d2b7c11")
+
+        XCTAssertEqual(StubURLProtocol.requests.first?.signature,
+                       "GET /tour-api/bookings/3f6c1a9e-8d2b-4b7a-a1c4-5e9f0d2b7c11/cancellation")
+        XCTAssertTrue(cancellation.allowed)
+        XCTAssertEqual(cancellation.refund.value, .partial)
+        XCTAssertEqual(cancellation.refundAmount?.amount, "31.25")
+    }
+
+    func testCancellationQuoteFallsBackToTheBookingOn404() async throws {
+        let exchange = try ContractFixtures.exchange("viator", "12-booking")
+        StubURLProtocol.answer([BC.RecordedResponse(status: 404, body: .object([:])), exchange.response])
+        let bookings = RemoteBookingClient(baseURL: baseURL, session: StubURLProtocol.session,
+                                           decorator: StaticContractHeaders([:]))
+
+        let cancellation = try await bookings.cancellationQuote(uuid: "3f6c1a9e-8d2b-4b7a-a1c4-5e9f0d2b7c11")
+
+        XCTAssertEqual(StubURLProtocol.requests.count, 2)
+        XCTAssertEqual(StubURLProtocol.requests[0].signature,
+                       "GET /tour-api/bookings/3f6c1a9e-8d2b-4b7a-a1c4-5e9f0d2b7c11/cancellation")
+        XCTAssertEqual(StubURLProtocol.requests[1].signature,
+                       "GET /tour-api/bookings/3f6c1a9e-8d2b-4b7a-a1c4-5e9f0d2b7c11?lang=en")
+        XCTAssertTrue(cancellation.allowed)
+        XCTAssertEqual(cancellation.refund.value, .full)
+        XCTAssertEqual(cancellation.refundAmount?.amount, "145.00")
+    }
+
+    func testCancellationQuoteOnAServerErrorThrowsWithoutFallingBackToTheBooking() async throws {
+        let exchange = try ContractFixtures.exchange("viator/errors", "SUPPLIER_UNAVAILABLE")
+        StubURLProtocol.answer([exchange.response])
+        let bookings = RemoteBookingClient(baseURL: baseURL, session: StubURLProtocol.session,
+                                           decorator: StaticContractHeaders([:]))
+
+        do {
+            _ = try await bookings.cancellationQuote(uuid: "3f6c1a9e-8d2b-4b7a-a1c4-5e9f0d2b7c11")
+            XCTFail("a 503 did not throw")
+        } catch let error as BC.ContractError {
+            XCTAssertEqual(error.httpStatus, 503)
+            XCTAssertEqual(error.code, .supplierUnavailable)
+        }
+
+        XCTAssertEqual(StubURLProtocol.requests.count, 1)
+    }
+
     func testBaseURLWithTrailingSlashAndReservedCharactersInIds() async throws {
         let exchange = try ContractFixtures.exchange("viator", "10-poll")
         StubURLProtocol.answer([exchange.response])
